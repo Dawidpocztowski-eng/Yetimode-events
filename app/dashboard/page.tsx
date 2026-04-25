@@ -92,12 +92,6 @@ export default function DashboardPage() {
         </div>
 
         <div className="mb-6"><PlanBanner /></div>
-            </p>
-          </div>
-          <Link href="/dashboard/new" className="btn-primary">
-            <Plus size={16} /> Nowe wydarzenie
-          </Link>
-        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
