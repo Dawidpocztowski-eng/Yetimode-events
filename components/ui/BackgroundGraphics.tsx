@@ -176,41 +176,41 @@ export function TechBackground() {
         <polygon points="155,83 170,74 185,83 185,101 170,110 155,101" fill="none" stroke="#8b5cf6" strokeWidth="0.5" strokeOpacity="0.08" />
 
         {/* Hexagon prawy */}
-        <g transform="translate(85%, 70%)">
+        <g transform="translate(1200, 500)">
           <polygon points="-40,-23 0,-46 40,-23 40,23 0,46 -40,23" fill="none" stroke="#6366f1" strokeWidth="0.8" strokeOpacity="0.1" />
           <polygon points="-28,-16 0,-32 28,-16 28,16 0,32 -28,16" fill="none" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.07" />
         </g>
 
         {/* Linie połączeń (jak sieć) */}
-        <line x1="15%" y1="15%" x2="35%" y2="25%" stroke="#8b5cf6" strokeWidth="0.4" strokeOpacity="0.1" />
-        <line x1="35%" y1="25%" x2="55%" y2="15%" stroke="#8b5cf6" strokeWidth="0.4" strokeOpacity="0.1" />
-        <line x1="55%" y1="15%" x2="75%" y2="30%" stroke="#8b5cf6" strokeWidth="0.4" strokeOpacity="0.08" />
-        <line x1="75%" y1="30%" x2="90%" y2="20%" stroke="#8b5cf6" strokeWidth="0.4" strokeOpacity="0.08" />
-        <line x1="10%" y1="70%" x2="30%" y2="80%" stroke="#6366f1" strokeWidth="0.4" strokeOpacity="0.08" />
-        <line x1="30%" y1="80%" x2="50%" y2="70%" stroke="#6366f1" strokeWidth="0.4" strokeOpacity="0.08" />
-        <line x1="50%" y1="70%" x2="70%" y2="85%" stroke="#6366f1" strokeWidth="0.4" strokeOpacity="0.06" />
+        <line x1="150" y1="150" x2="350" y2="250" stroke="#8b5cf6" strokeWidth="0.4" strokeOpacity="0.1" />
+        <line x1="350" y1="250" x2="550" y2="150" stroke="#8b5cf6" strokeWidth="0.4" strokeOpacity="0.1" />
+        <line x1="550" y1="150" x2="750" y2="300" stroke="#8b5cf6" strokeWidth="0.4" strokeOpacity="0.08" />
+        <line x1="750" y1="300" x2="900" y2="200" stroke="#8b5cf6" strokeWidth="0.4" strokeOpacity="0.08" />
+        <line x1="100" y1="700" x2="300" y2="800" stroke="#6366f1" strokeWidth="0.4" strokeOpacity="0.08" />
+        <line x1="300" y1="800" x2="500" y2="700" stroke="#6366f1" strokeWidth="0.4" strokeOpacity="0.08" />
+        <line x1="500" y1="700" x2="700" y2="850" stroke="#6366f1" strokeWidth="0.4" strokeOpacity="0.06" />
 
         {/* Węzły sieci */}
-        <circle cx="15%" cy="15%" r="3" fill="#8b5cf6" fillOpacity="0.2" />
-        <circle cx="35%" cy="25%" r="2" fill="#8b5cf6" fillOpacity="0.15" />
-        <circle cx="55%" cy="15%" r="3" fill="#8b5cf6" fillOpacity="0.18" />
-        <circle cx="75%" cy="30%" r="2" fill="#8b5cf6" fillOpacity="0.12" />
-        <circle cx="90%" cy="20%" r="2.5" fill="#8b5cf6" fillOpacity="0.15" />
-        <circle cx="10%" cy="70%" r="2" fill="#6366f1" fillOpacity="0.15" />
-        <circle cx="30%" cy="80%" r="3" fill="#6366f1" fillOpacity="0.12" />
-        <circle cx="50%" cy="70%" r="2" fill="#6366f1" fillOpacity="0.15" />
-        <circle cx="70%" cy="85%" r="2.5" fill="#6366f1" fillOpacity="0.1" />
+        <circle cx="150" cy="150" r="3" fill="#8b5cf6" fillOpacity="0.2" />
+        <circle cx="350" cy="250" r="2" fill="#8b5cf6" fillOpacity="0.15" />
+        <circle cx="550" cy="150" r="3" fill="#8b5cf6" fillOpacity="0.18" />
+        <circle cx="750" cy="300" r="2" fill="#8b5cf6" fillOpacity="0.12" />
+        <circle cx="900" cy="200" r="2.5" fill="#8b5cf6" fillOpacity="0.15" />
+        <circle cx="100" cy="700" r="2" fill="#6366f1" fillOpacity="0.15" />
+        <circle cx="300" cy="800" r="3" fill="#6366f1" fillOpacity="0.12" />
+        <circle cx="500" cy="700" r="2" fill="#6366f1" fillOpacity="0.15" />
+        <circle cx="700" cy="850" r="2.5" fill="#6366f1" fillOpacity="0.1" />
 
         {/* Okręgi koncentryczne */}
-        <circle cx="5%" cy="50%" r="60" fill="none" stroke="#8b5cf6" strokeWidth="0.5" strokeOpacity="0.08" strokeDasharray="4 8" />
-        <circle cx="5%" cy="50%" r="40" fill="none" stroke="#8b5cf6" strokeWidth="0.5" strokeOpacity="0.06" strokeDasharray="4 8" />
-        <circle cx="95%" cy="50%" r="80" fill="none" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.07" strokeDasharray="4 8" />
+        <circle cx="50" cy="500" r="60" fill="none" stroke="#8b5cf6" strokeWidth="0.5" strokeOpacity="0.08" strokeDasharray="4 8" />
+        <circle cx="50" cy="500" r="40" fill="none" stroke="#8b5cf6" strokeWidth="0.5" strokeOpacity="0.06" strokeDasharray="4 8" />
+        <circle cx="950" cy="500" r="80" fill="none" stroke="#6366f1" strokeWidth="0.5" strokeOpacity="0.07" strokeDasharray="4 8" />
 
         {/* Małe kwadraty */}
-        <rect x="40%" y="3%" width="8" height="8" fill="none" stroke="#8b5cf6" strokeWidth="0.8" strokeOpacity="0.15" transform="rotate(45 40% 3%)" />
-        <rect x="60%" y="92%" width="8" height="8" fill="none" stroke="#6366f1" strokeWidth="0.8" strokeOpacity="0.12" transform="rotate(45 60% 92%)" />
-        <rect x="2%" y="25%" width="6" height="6" fill="none" stroke="#8b5cf6" strokeWidth="0.8" strokeOpacity="0.12" transform="rotate(45 2% 25%)" />
-        <rect x="97%" y="75%" width="6" height="6" fill="none" stroke="#6366f1" strokeWidth="0.8" strokeOpacity="0.12" transform="rotate(45 97% 75%)" />
+        <rect x="390" y="25" width="8" height="8" fill="none" stroke="#8b5cf6" strokeWidth="0.8" strokeOpacity="0.15" transform="rotate(45 394 29)" />
+        <rect x="590" y="910" width="8" height="8" fill="none" stroke="#6366f1" strokeWidth="0.8" strokeOpacity="0.12" transform="rotate(45 594 914)" />
+        <rect x="18" y="240" width="6" height="6" fill="none" stroke="#8b5cf6" strokeWidth="0.8" strokeOpacity="0.12" transform="rotate(45 21 243)" />
+        <rect x="960" y="740" width="6" height="6" fill="none" stroke="#6366f1" strokeWidth="0.8" strokeOpacity="0.12" transform="rotate(45 963 743)" />
       </svg>
     </div>
   )
