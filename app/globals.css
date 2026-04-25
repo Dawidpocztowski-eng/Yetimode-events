@@ -25,7 +25,7 @@ body { font-family: 'Inter', sans-serif; }
 
   /* Karta — ciemna */
   .card {
-    @apply bg-[#13131f] border border-white/8 rounded-2xl p-5;
+    @apply bg-[#13131f] border border-white/10 rounded-2xl p-5;
   }
 
   .label {
