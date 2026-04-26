@@ -1,21 +1,27 @@
 import Link from 'next/link'
-import { Sparkles, ArrowRight, Check, Heart, PartyPopper, Baby, Camera, Users, Star, ChevronRight } from 'lucide-react'
-import { TechBackground } from '@/components/ui/BackgroundGraphics'
+import Image from 'next/image'
+import { ArrowRight, Check, Heart, PartyPopper, Baby, Camera, Users, Star, ChevronRight, Sparkles } from 'lucide-react'
 
 function Nav() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0B0F19]/90 backdrop-blur-xl">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg text-white">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-            <Sparkles size={14} className="text-white" />
+        <Link href="/" className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#101828] flex items-center justify-center">
+            <span className="text-lg">🦁</span>
           </div>
-          YetiMode Events
+          <div className="flex items-baseline gap-1">
+            <span className="font-bold text-lg text-white">Yeti</span>
+            <span className="font-bold text-lg" style={{ color: '#22D3EE' }}>Mode</span>
+            <span className="text-xs font-semibold text-gray-400 ml-1 tracking-widest uppercase">Events</span>
+          </div>
         </Link>
         <div className="flex items-center gap-3">
           <Link href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-2 hidden sm:block">Cennik</Link>
           <Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-2">Zaloguj się</Link>
-          <Link href="/register" className="text-sm font-medium bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-4 py-2 rounded-xl transition-all shadow-lg shadow-violet-900/30">
+          <Link href="/register"
+            className="text-sm font-semibold text-white px-4 py-2 rounded-xl transition-all shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #146EF5, #22D3EE)' }}>
             Zacznij za darmo
           </Link>
         </div>
@@ -30,7 +36,7 @@ function MockBrowser({ title, emoji, date, location, countdown, gradient, classN
   gradient: string; className?: string
 }) {
   return (
-    <div className={`bg-[#13131a] border border-white/10 rounded-2xl shadow-2xl w-60 overflow-hidden hover:scale-105 transition-transform duration-300 ${className}`}>
+    <div className={`bg-[#101828] border border-white/10 rounded-2xl shadow-2xl w-60 overflow-hidden hover:scale-105 transition-transform duration-300 ${className}`}>
       <div className="flex items-center gap-1.5 px-3 py-2.5 border-b border-white/5">
         <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
         <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
@@ -58,7 +64,7 @@ function MockBrowser({ title, emoji, date, location, countdown, gradient, classN
 
 const EVENT_TYPES = [
   { icon: Heart, label: 'Wesele', desc: 'Strona ślubna z RSVP, planem dnia, galerią i foto budką.', gradient: 'from-pink-600/20 to-rose-600/10', border: 'border-pink-500/20', iconColor: 'text-pink-400', iconBg: 'bg-pink-500/10' },
-  { icon: PartyPopper, label: 'Urodziny', desc: 'Zorganizuj niezapomniane urodziny z potwierdzeniami online.', gradient: 'from-violet-600/20 to-indigo-600/10', border: 'border-violet-500/20', iconColor: 'text-violet-400', iconBg: 'bg-violet-500/10' },
+  { icon: PartyPopper, label: 'Urodziny', desc: 'Zorganizuj niezapomniane urodziny z potwierdzeniami online.', gradient: 'from-[#146EF5]/20 to-[#22D3EE]/10', border: 'border-[#146EF5]/20', iconColor: 'text-[#22D3EE]', iconBg: 'bg-[#146EF5]/10' },
   { icon: Baby, label: 'Chrzciny', desc: 'Piękna strona z galerią i wspomnieniami od rodziny.', gradient: 'from-sky-600/20 to-cyan-600/10', border: 'border-sky-500/20', iconColor: 'text-sky-400', iconBg: 'bg-sky-500/10' },
 ]
 
@@ -71,28 +77,40 @@ const FEATURES = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[#0B0F19] text-white">
       <Nav />
 
       {/* HERO */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-16 overflow-hidden">
-        <TechBackground />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-medium px-4 py-1.5 rounded-full mb-8">
-            <Sparkles size={12} /> Platforma wydarzeń online
+      <section className="relative min-h-screen flex flex-col items-center justify-center pt-16 overflow-hidden px-4">
+        {/* Tło */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(20,110,245,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(20,110,245,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] rounded-full blur-[160px] opacity-15 pointer-events-none" style={{ background: 'radial-gradient(ellipse, #146EF5, transparent)' }} />
+
+        <div className="relative z-10 max-w-5xl mx-auto text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 border text-xs font-medium px-4 py-1.5 rounded-full mb-8"
+            style={{ borderColor: 'rgba(20,110,245,0.3)', background: 'rgba(20,110,245,0.1)', color: '#22D3EE' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] animate-pulse" />
+            Platforma wydarzeń online
           </div>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight mb-6">
-            Twoje wydarzenie<br />
-            <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-pink-400 bg-clip-text text-transparent">
-              zasługuje na więcej
+
+          {/* Headline */}
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight mb-4">
+            Planuj. Twórz.<br />
+            <span style={{ background: 'linear-gradient(135deg, #146EF5, #22D3EE)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Zapraszaj. Świętuj.
             </span>
           </h1>
+
           <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
             Stwórz piękną stronę wesela, urodzin lub chrzcin w kilka minut.
             RSVP, galeria, foto budka i planer — wszystko w jednym miejscu.
           </p>
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-            <Link href="/register" className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold px-8 py-4 rounded-2xl transition-all shadow-2xl shadow-violet-900/40 text-base">
+            <Link href="/register"
+              className="flex items-center gap-2 text-white font-semibold px-8 py-4 rounded-2xl transition-all shadow-2xl text-base"
+              style={{ background: 'linear-gradient(135deg, #146EF5, #22D3EE)', boxShadow: '0 20px 60px rgba(20,110,245,0.3)' }}>
               Utwórz wydarzenie za darmo <ArrowRight size={18} />
             </Link>
             <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">
@@ -106,7 +124,7 @@ export default function LandingPage() {
               countdown={{ d: 412, h: 8, m: 33 }} gradient="from-pink-600/40 to-rose-600/40"
               className="absolute -rotate-3 left-0 top-4" />
             <MockBrowser title="Urodziny Marka 🎂" emoji="🎂" date="22·08·2027" location="Warszawa"
-              countdown={{ d: 450, h: 14, m: 22 }} gradient="from-violet-600/40 to-indigo-600/40"
+              countdown={{ d: 450, h: 14, m: 22 }} gradient="from-[#146EF5]/40 to-[#22D3EE]/40"
               className="absolute left-1/2 -translate-x-1/2 top-0 z-10" />
             <MockBrowser title="Chrzciny Zosi 🕊️" emoji="🕊️" date="10·09·2027" location="Gdańsk"
               countdown={{ d: 469, h: 6, m: 11 }} gradient="from-sky-600/40 to-cyan-600/40"
@@ -119,7 +137,7 @@ export default function LandingPage() {
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-violet-400 text-sm font-medium uppercase tracking-widest mb-3">Typy wydarzeń</p>
+            <p className="text-sm font-medium uppercase tracking-widest mb-3" style={{ color: '#22D3EE' }}>Typy wydarzeń</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white">Na każdą okazję</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -141,17 +159,17 @@ export default function LandingPage() {
 
       {/* FEATURES */}
       <section className="py-24 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-violet-950/10 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(20,110,245,0.03), transparent)' }} />
         <div className="max-w-5xl mx-auto relative">
           <div className="text-center mb-14">
-            <p className="text-violet-400 text-sm font-medium uppercase tracking-widest mb-3">Funkcje</p>
+            <p className="text-sm font-medium uppercase tracking-widest mb-3" style={{ color: '#22D3EE' }}>Funkcje</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white">Wszystko czego potrzebujesz</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {FEATURES.map(({ icon: Icon, label, desc }) => (
-              <div key={label} className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-violet-500/30 transition-colors">
-                <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Icon size={20} className="text-violet-400" />
+              <div key={label} className="flex items-start gap-4 bg-[#101828] border border-white/10 rounded-2xl p-5 hover:border-[#146EF5]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(20,110,245,0.1)' }}>
+                  <Icon size={20} style={{ color: '#22D3EE' }} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">{label}</h3>
@@ -167,7 +185,7 @@ export default function LandingPage() {
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-violet-400 text-sm font-medium uppercase tracking-widest mb-3">Jak to działa</p>
+            <p className="text-sm font-medium uppercase tracking-widest mb-3" style={{ color: '#22D3EE' }}>Jak to działa</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white">Proste jak 1, 2, 3</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -177,8 +195,9 @@ export default function LandingPage() {
               { num: '03', title: 'Ciesz się chwilą', desc: 'Goście robią zdjęcia, Ty masz wszystko pod kontrolą.' },
             ].map(({ num, title, desc }) => (
               <div key={num} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/20 flex items-center justify-center">
-                  <span className="text-violet-400 font-bold text-lg">{num}</span>
+                <div className="w-16 h-16 mx-auto mb-5 rounded-2xl flex items-center justify-center border"
+                  style={{ background: 'rgba(20,110,245,0.1)', borderColor: 'rgba(20,110,245,0.3)' }}>
+                  <span className="font-bold text-lg" style={{ color: '#22D3EE' }}>{num}</span>
                 </div>
                 <h3 className="text-white font-semibold mb-2">{title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
@@ -191,14 +210,17 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="relative bg-gradient-to-br from-violet-950/60 to-indigo-950/60 border border-violet-500/20 rounded-3xl p-12 overflow-hidden">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-violet-600/20 rounded-full blur-3xl" />
+          <div className="relative rounded-3xl p-12 overflow-hidden border"
+            style={{ background: 'linear-gradient(135deg, rgba(20,110,245,0.15), rgba(34,211,238,0.05))', borderColor: 'rgba(20,110,245,0.3)' }}>
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(20,110,245,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(20,110,245,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full blur-3xl opacity-30" style={{ background: '#146EF5' }} />
             <div className="relative">
-              <Sparkles size={32} className="text-violet-400 mx-auto mb-4" />
+              <div className="text-4xl mb-4">🦁</div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Gotowy na start?</h2>
               <p className="text-gray-400 mb-8 max-w-md mx-auto">Dołącz do organizatorów, którzy tworzą niezapomniane wydarzenia z YetiMode Events.</p>
-              <Link href="/register" className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-violet-900/40">
+              <Link href="/register"
+                className="inline-flex items-center gap-2 text-white font-semibold px-8 py-4 rounded-2xl transition-all"
+                style={{ background: 'linear-gradient(135deg, #146EF5, #22D3EE)', boxShadow: '0 20px 60px rgba(20,110,245,0.3)' }}>
                 Utwórz wydarzenie za darmo <ArrowRight size={18} />
               </Link>
               <p className="text-gray-600 text-xs mt-4">Bez karty kredytowej · Gotowe w 2 minuty</p>
@@ -207,13 +229,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-white/5 py-10 px-6">
+      <footer className="border-t border-white/5 py-10 px-6" style={{ background: '#0B0F19' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 font-bold text-white">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-              <Sparkles size={12} className="text-white" />
-            </div>
-            YetiMode Events
+            <span className="text-lg">🦁</span>
+            <span>Yeti</span><span style={{ color: '#22D3EE' }}>Mode</span>
+            <span className="text-xs text-gray-500 tracking-widest uppercase ml-1">Events</span>
           </div>
           <div className="flex items-center gap-6 text-xs text-gray-600">
             <Link href="/pricing" className="hover:text-gray-400 transition-colors">Cennik</Link>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Guest } from '@/lib/types'
-import { Plus, Trash2, Users, UserCheck, Briefcase, Search, X, Baby, Heart, Pencil, Save, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Trash2, Users, UserCheck, Briefcase, Search, X, Baby, Heart, Pencil, Save, ChevronDown, ChevronUp, FileDown } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const GROUP_CONFIG = {
@@ -25,6 +25,13 @@ export default function EventGuests({ eventId }: { eventId: string }) {
   const [form, setForm] = useState(emptyForm)
   const [newChildName, setNewChildName] = useState('')
   const supabase = createClient()
+
+  const exportCSV = async () => {
+    const a = document.createElement('a')
+    a.href = `/api/export/guests?eventId=${eventId}`
+    a.download = 'goscie.csv'
+    a.click()
+  }
 
   const load = async () => {
     const { data } = await supabase.from('guests').select('*').eq('event_id', eventId).order('created_at')
@@ -82,6 +89,9 @@ export default function EventGuests({ eventId }: { eventId: string }) {
         </div>
         <button onClick={openAdd} className="btn-primary py-2 px-4 text-sm">
           <Plus size={16} /> Dodaj
+        </button>
+        <button onClick={exportCSV} className="btn-secondary py-2 px-3 text-sm">
+          <FileDown size={15} />
         </button>
       </div>
 

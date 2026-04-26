@@ -169,7 +169,7 @@ export function TechBackground() {
 
         {/* Duże trójkąty */}
         <polygon points="0,0 400,0 0,400" fill="url(#tg1)" />
-        <polygon points="100%,100% 100%,40% 60%,100%" fill="url(#tg2)" />
+        <polygon points="1000,1000 1000,400 600,1000" fill="url(#tg2)" />
 
         {/* Hexagony */}
         <polygon points="150,80 170,68 190,80 190,104 170,116 150,104" fill="none" stroke="#8b5cf6" strokeWidth="0.8" strokeOpacity="0.12" />

@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Event } from '@/lib/types'
-import { Trash2, Download, RefreshCw, Image } from 'lucide-react'
+import { Trash2, Download, RefreshCw, Image, FileDown } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function EventGallery({ event }: { event: Event }) {
   const [photos, setPhotos] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [exporting, setExporting] = useState(false)
   const supabase = createClient()
 
   const load = async () => {
@@ -26,6 +27,30 @@ export default function EventGallery({ event }: { event: Event }) {
     toast.success('Zdjęcie usunięte')
   }
 
+  const exportZip = async () => {
+    setExporting(true)
+    try {
+      const res = await fetch(`/api/export/gallery?eventId=${event.id}`)
+      if (!res.ok) {
+        const err = await res.json()
+        toast.error(err.error || 'Błąd eksportu')
+        return
+      }
+      const { photos: urls } = await res.json()
+      // Pobierz każde zdjęcie osobno
+      for (const { url, filename } of urls) {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        a.target = '_blank'
+        a.click()
+        await new Promise(r => setTimeout(r, 300))
+      }
+      toast.success(`Pobrano ${urls.length} zdjęć!`)
+    } catch { toast.error('Błąd eksportu') }
+    finally { setExporting(false) }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -35,6 +60,9 @@ export default function EventGallery({ event }: { event: Event }) {
         </div>
         <button onClick={load} className="btn-secondary py-2 px-4 text-sm">
           <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Odśwież
+        </button>
+        <button onClick={exportZip} disabled={exporting} className="btn-secondary py-2 px-4 text-sm">
+          <FileDown size={15} /> {exporting ? 'Pobieranie...' : 'Pobierz wszystkie'}
         </button>
       </div>
 
