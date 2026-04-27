@@ -146,7 +146,7 @@ export default function EventBudget({ eventId }: { eventId: string }) {
 
   const openEdit = (item: BudgetItem) => {
     const mainCat = getMainCategory(item.category)
-    const sub = BUDGET_STRUCTURE.find(m => m.id === mainCat)?.subcategories.includes(item.category as any) ? item.category : ''
+    const sub = (BUDGET_STRUCTURE.find(m => m.id === mainCat)?.subcategories as readonly string[] | undefined)?.includes(item.category) ? item.category : ''
     setForm({ name: item.name, mainCategory: mainCat as MainCategoryId, subcategory: sub, totalCost: String(item.total_cost), note: item.note || '' })
     setEditItem(item)
     setShowForm(true)
