@@ -131,11 +131,18 @@ export default function EventBudget({ eventId }: { eventId: string }) {
 
   // Grupowanie po głównej kategorii
   const getMainCategory = (category: string) => {
+    // Mapowanie starych kategorii na nowe
+    const legacyMap: Record<string, string> = {
+      'sala': 'miejsce', 'catering': 'jedzenie', 'muzyka': 'rozrywka',
+      'foto': 'foto', 'kwiaty': 'dekoracje', 'suknia': 'styl',
+      'transport': 'logistyka', 'inne': 'organizacja',
+    }
+    if (legacyMap[category]) return legacyMap[category]
     for (const main of BUDGET_STRUCTURE) {
       if (main.id === category) return main.id
       if ((main.subcategories as readonly string[]).includes(category)) return main.id
     }
-    return 'inne'
+    return 'organizacja' // fallback zamiast 'inne' — żeby było widoczne
   }
 
   const openAdd = (mainCat?: string) => {
