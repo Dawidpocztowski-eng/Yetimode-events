@@ -65,7 +65,10 @@ export default function EventDashboard({ event }: { event: Event }) {
   const needsAccommodation = attending.filter(r => r.accommodation).length
   const needsTransport = attending.filter(r => r.transport).length
   const unconfirmedGuests = guests.filter(g => !g.confirmed)
-  const confirmPct = guests.length > 0 ? Math.round((guests.filter(g => g.confirmed).length / guests.length) * 100) : 0
+  // Pasek: ile gości z listy potwierdziło przez RSVP (dopasowanie po imieniu)
+  const rsvpNames = new Set(rsvps.filter(r => r.attending).map(r => `${r.first_name} ${r.last_name}`.toLowerCase().trim()))
+  const confirmedFromList = guests.filter(g => rsvpNames.has(g.name.toLowerCase().trim())).length
+  const confirmPct = guests.length > 0 ? Math.round((Math.max(confirmedFromList, attending.length) / guests.length) * 100) : attending.length > 0 ? 100 : 0
   const copyLink = () => { navigator.clipboard.writeText(eventUrl); toast.success('Link skopiowany!') }
 
   return (
@@ -79,10 +82,10 @@ export default function EventDashboard({ event }: { event: Event }) {
             <span className={`text-sm font-bold ${confirmPct >= 80 ? 'text-green-400' : confirmPct >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{confirmPct}%</span>
           </div>
           <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden">
-            <div className={`h-full rounded-full transition-all duration-700 ${confirmPct >= 80 ? 'bg-green-500' : confirmPct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${confirmPct}%` }} />
+            <div className={`h-full rounded-full transition-all duration-700 ${confirmPct >= 80 ? 'bg-green-500' : confirmPct >= 50 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${Math.max(confirmPct, attending.length > 0 ? 3 : 0)}%` }} />
           </div>
           <div className="flex justify-between mt-2 text-xs text-gray-500">
-            <span>{guests.filter(g => g.confirmed).length} potwierdzonych</span>
+            <span>{attending.length} potwierdziło przez RSVP</span>
             <span>{guests.length} na liście</span>
           </div>
         </div>

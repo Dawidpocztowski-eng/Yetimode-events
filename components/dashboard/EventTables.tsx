@@ -163,23 +163,80 @@ export default function EventTables({ eventId }: { eventId: string }) {
       {/* Modal: przydziel gościa */}
       {showAddGuest&&(
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end justify-center p-4">
-          <div className="bg-[#13131f] border border-white/10 rounded-3xl w-full max-w-sm p-6 space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-[#13131f] border border-white/10 rounded-3xl w-full max-w-sm p-6 space-y-4 max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between flex-shrink-0">
               <h3 className="font-bold text-lg text-white">Przydziel gościa</h3>
-              <button onClick={()=>setShowAddGuest(null)} className="text-gray-500 hover:text-gray-300"><X size={20}/></button>
+              <button onClick={()=>{setShowAddGuest(null);setGuestInput('');setSuggestions([])}} className="text-gray-500 hover:text-gray-300"><X size={20}/></button>
             </div>
-            <p className="text-sm text-gray-400">Stolik: <strong className="text-white">{tables.find(t=>t.id===showAddGuest)?.name}</strong></p>
-            <div className="relative">
-              <input value={guestInput} onChange={e=>handleGuestInput(e.target.value)} className="input" placeholder="Imię i nazwisko" autoFocus/>
-              {suggestions.length>0&&(
-                <div className="absolute top-full left-0 right-0 bg-[#1a1a2e] border border-white/10 rounded-2xl shadow-lg mt-1 overflow-hidden z-10">
-                  {suggestions.map(name=>(
-                    <button key={name} onClick={()=>{setGuestInput(name);setSuggestions([])}} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-violet-500/10 transition-colors">{name}</button>
-                  ))}
-                </div>
+            <p className="text-sm text-gray-400 flex-shrink-0">
+              Stolik: <strong className="text-white">{tables.find(t=>t.id===showAddGuest)?.name}</strong>
+              {' · '}
+              <span className="text-gray-500">
+                {tables.find(t=>t.id===showAddGuest)?.seats.length || 0}/{tables.find(t=>t.id===showAddGuest)?.capacity || 0} miejsc
+              </span>
+            </p>
+
+            {/* Wyszukiwarka */}
+            <div className="relative flex-shrink-0">
+              <input
+                value={guestInput}
+                onChange={e => { setGuestInput(e.target.value); setSuggestions([]) }}
+                className="input"
+                placeholder="Szukaj gościa..."
+                autoFocus
+              />
+            </div>
+
+            {/* Lista gości z checkboxami */}
+            <div className="overflow-y-auto flex-1 space-y-1 min-h-0">
+              {guestNames
+                .filter(name => {
+                  // Filtruj po wyszukiwarce
+                  if (guestInput && !name.toLowerCase().includes(guestInput.toLowerCase())) return false
+                  // Ukryj już przydzielonych do tego stolika
+                  const table = tables.find(t => t.id === showAddGuest)
+                  if (table?.seats.some(s => s.guest_name === name)) return false
+                  return true
+                })
+                .map(name => (
+                  <button
+                    key={name}
+                    onClick={() => { setGuestInput(name); }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+                      guestInput === name
+                        ? 'bg-violet-500/20 border border-violet-500/30 text-white'
+                        : 'bg-white/5 border border-white/5 text-gray-300 hover:bg-white/10'
+                    }`}
+                  >
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                      guestInput === name ? 'bg-violet-500 border-violet-500' : 'border-gray-600'
+                    }`}>
+                      {guestInput === name && <span className="text-white text-[10px]">✓</span>}
+                    </div>
+                    <span className="text-sm font-medium">{name}</span>
+                  </button>
+                ))
+              }
+              {guestNames.filter(n => !guestInput || n.toLowerCase().includes(guestInput.toLowerCase())).length === 0 && (
+                <p className="text-center text-gray-600 text-sm py-4">Brak gości do przydzielenia</p>
               )}
             </div>
-            <button onClick={()=>addGuestToTable(showAddGuest!)} className="btn-primary w-full">Przydziel miejsce</button>
+
+            {/* Wpisz ręcznie jeśli nie ma na liście */}
+            {guestInput && !guestNames.includes(guestInput) && (
+              <p className="text-xs text-gray-500 flex-shrink-0">
+                Nie ma na liście? Zostanie dodany jako: <strong className="text-gray-300">{guestInput}</strong>
+              </p>
+            )}
+
+            <button
+              onClick={() => addGuestToTable(showAddGuest!)}
+              disabled={!guestInput.trim()}
+              className="btn-primary w-full flex-shrink-0"
+              style={{ background: guestInput.trim() ? 'linear-gradient(135deg, #146EF5, #22D3EE)' : undefined }}
+            >
+              Przydziel: {guestInput || '—'}
+            </button>
           </div>
         </div>
       )}

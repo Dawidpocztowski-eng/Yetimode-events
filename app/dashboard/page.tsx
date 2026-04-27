@@ -62,10 +62,8 @@ export default function DashboardPage() {
       <nav className="relative z-10 border-b border-white/5 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-              <Sparkles size={14} className="text-white" />
-            </div>
-            <span className="font-bold text-white">YetiMode</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-full.png" alt="YetiMode Events" className="h-7 w-auto object-contain" />
           </Link>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500 hidden sm:block">{userName}</span>

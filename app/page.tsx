@@ -7,13 +7,9 @@ function Nav() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0B0F19]/90 backdrop-blur-xl">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#101828] flex items-center justify-center">
-            <span className="text-lg">🦁</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className="font-bold text-lg text-white">Yeti</span>
-            <span className="font-bold text-lg" style={{ color: '#22D3EE' }}>Mode</span>
-            <span className="text-xs font-semibold text-gray-400 ml-1 tracking-widest uppercase">Events</span>
+          <div className="h-8 flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-full.png" alt="YetiMode Events" className="h-8 w-auto object-contain" />
           </div>
         </Link>
         <div className="flex items-center gap-3">
