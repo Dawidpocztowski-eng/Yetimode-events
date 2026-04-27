@@ -9,7 +9,7 @@ function Nav() {
         <Link href="/" className="flex items-center gap-3">
           <div className="h-8 flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-full.png" alt="YetiMode Events" className="h-8 w-auto object-contain" />
+            <img src="/logo.png" alt="YetiMode Events" className="h-8 w-auto object-contain" />
           </div>
         </Link>
         <div className="flex items-center gap-3">
