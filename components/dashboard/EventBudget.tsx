@@ -133,7 +133,7 @@ export default function EventBudget({ eventId }: { eventId: string }) {
   const getMainCategory = (category: string) => {
     for (const main of BUDGET_STRUCTURE) {
       if (main.id === category) return main.id
-      if (main.subcategories.includes(category as any)) return main.id
+      if ((main.subcategories as readonly string[]).includes(category)) return main.id
     }
     return 'inne'
   }
