@@ -20,9 +20,11 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
   const color = event.primary_color || '#0ea5e9'
   const webcamRef = useRef<Webcam>(null)
   const [photo, setPhoto] = useState<string | null>(null)
+  const [uploadedFiles, setUploadedFiles] = useState<{ dataUrl: string; name: string }[]>([])
   const [frame, setFrame] = useState('none')
   const [mode, setMode] = useState<'camera' | 'upload'>('camera')
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null)
   const [cameraReady, setCameraReady] = useState(false)
 
   const capture = useCallback(() => {
@@ -31,10 +33,25 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
   }, [])
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => setPhoto(ev.target?.result as string)
-    reader.readAsDataURL(file)
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    const fileArray = Array.from(files)
+    const results: { dataUrl: string; name: string }[] = []
+    let loaded = 0
+    fileArray.forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = ev => {
+        results.push({ dataUrl: ev.target?.result as string, name: file.name })
+        loaded++
+        if (loaded === fileArray.length) setUploadedFiles(results)
+      }
+      reader.readAsDataURL(file)
+    })
+    e.target.value = ''
+  }
+
+  const removeUploadedFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index))
   }
 
   const uploadPhoto = async () => {
@@ -51,11 +68,46 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
       if (dbError) throw dbError
       toast.success('Zdjęcie dodane do galerii! 🎉')
       setPhoto(null)
-    } catch (err) {
+    } catch {
       toast.error('Błąd podczas wgrywania')
     } finally {
       setUploading(false)
     }
+  }
+
+  const uploadAllFiles = async () => {
+    if (uploadedFiles.length === 0) return
+    setUploading(true)
+    setUploadProgress({ done: 0, total: uploadedFiles.length })
+    let successCount = 0
+    let errorCount = 0
+    const supabase = createClient()
+
+    for (let i = 0; i < uploadedFiles.length; i++) {
+      try {
+        const blob = await (await fetch(uploadedFiles[i].dataUrl)).blob()
+        const path = `${event.id}/${uuidv4()}.jpg`
+        const { error: uploadError } = await supabase.storage.from('gallery').upload(path, blob, { contentType: 'image/jpeg' })
+        if (uploadError) throw uploadError
+        const { data: { publicUrl } } = supabase.storage.from('gallery').getPublicUrl(path)
+        const { error: dbError } = await supabase.from('gallery_photos').insert({ event_id: event.id, storage_path: path, url: publicUrl, frame })
+        if (dbError) throw dbError
+        successCount++
+      } catch {
+        errorCount++
+      }
+      setUploadProgress({ done: i + 1, total: uploadedFiles.length })
+    }
+
+    setUploading(false)
+    setUploadProgress(null)
+
+    if (errorCount === 0) {
+      toast.success(`${successCount} ${successCount === 1 ? 'zdjęcie dodane' : 'zdjęcia dodane'} do galerii! 🎉`)
+    } else {
+      toast.error(`${successCount} wgrano, ${errorCount} błędów`)
+    }
+    if (successCount > 0) setUploadedFiles([])
   }
 
   const getOverlay = () => {
@@ -127,11 +179,63 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
                 )}
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center h-56 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:border-gray-300 transition-colors">
-                <Upload size={36} className="text-gray-300 mb-2" />
-                <span className="text-gray-400 text-sm">Kliknij aby wybrać zdjęcie</span>
-                <input type="file" accept="image/*" onChange={handleFile} className="hidden" />
-              </label>
+              <div className="space-y-4">
+                <label className="flex flex-col items-center justify-center h-40 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:border-gray-300 transition-colors">
+                  <Upload size={32} className="text-gray-300 mb-2" />
+                  <span className="text-gray-400 text-sm font-medium">Kliknij aby wybrać zdjęcia</span>
+                  <span className="text-gray-300 text-xs mt-1">Możesz wybrać wiele plików naraz</span>
+                  <input type="file" accept="image/*" multiple onChange={handleFile} className="hidden" />
+                </label>
+
+                {uploadedFiles.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      {uploadedFiles.map((f, i) => (
+                        <div key={i} className="relative rounded-xl overflow-hidden aspect-square bg-gray-100 group">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={f.dataUrl} alt={f.name} className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => removeUploadedFile(i)}
+                            className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={12} className="text-white" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {uploadProgress && (
+                      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${(uploadProgress.done / uploadProgress.total) * 100}%`, backgroundColor: color }}
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setUploadedFiles([])}
+                        disabled={uploading}
+                        className="flex-1 flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-500 rounded-xl py-3 hover:border-red-300 hover:text-red-400 transition-all text-sm"
+                      >
+                        <X size={15} /> Wyczyść
+                      </button>
+                      <button
+                        onClick={uploadAllFiles}
+                        disabled={uploading}
+                        className="flex-1 flex items-center justify-center gap-2 text-white rounded-xl py-3 text-sm font-semibold transition-all"
+                        style={{ backgroundColor: color }}
+                      >
+                        {uploading
+                          ? <><RefreshCw size={15} className="animate-spin" /> {uploadProgress ? `${uploadProgress.done}/${uploadProgress.total}` : 'Wysyłanie...'}</>
+                          : <><Send size={15} /> Dodaj {uploadedFiles.length} {uploadedFiles.length === 1 ? 'zdjęcie' : 'zdjęcia'}</>
+                        }
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )
           ) : (
             <div className="space-y-4">
