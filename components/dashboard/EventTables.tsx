@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Guest, TableItem } from '@/lib/types'
-import { Plus, Trash2, X, UserPlus, Circle, Users } from 'lucide-react'
+import { Plus, Trash2, X, UserPlus, Circle, Users, Pencil } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 // Rozwinięta lista wszystkich osób: główny gość + osoba towarzysząca + dzieci
@@ -33,6 +33,8 @@ export default function EventTables({ eventId }: { eventId: string }) {
   const [allPersons, setAllPersons] = useState<PersonEntry[]>([])
   const [showAddTable, setShowAddTable] = useState(false)
   const [showAddGuest, setShowAddGuest] = useState<string | null>(null)
+  const [editTable, setEditTable] = useState<TableItem | null>(null)
+  const [editForm, setEditForm] = useState({ name: '', shape: 'round' as 'round' | 'rect', capacity: '8' })
   const [newTable, setNewTable] = useState({ name: '', shape: 'round' as 'round' | 'rect', capacity: '8' })
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<string[]>([]) // keys of selected persons
@@ -61,6 +63,30 @@ export default function EventTables({ eventId }: { eventId: string }) {
   const removeTable = async (id: string) => {
     await supabase.from('event_tables').delete().eq('id', id)
     setTables(prev => prev.filter(t => t.id !== id)); toast.success('Usunięto')
+  }
+
+  const openEditTable = (table: TableItem) => {
+    setEditTable(table)
+    setEditForm({ name: table.name, shape: table.shape, capacity: String(table.capacity) })
+  }
+
+  const saveEditTable = async () => {
+    if (!editTable) return
+    if (!editForm.name.trim()) { toast.error('Podaj nazwę'); return }
+    const newCapacity = parseInt(editForm.capacity) || 8
+    // Jeśli zmniejszamy pojemność poniżej liczby zajętych miejsc — blokujemy
+    if (newCapacity < editTable.seats.length) {
+      toast.error(`Nie można zmniejszyć pojemności — stolik ma ${editTable.seats.length} gości`)
+      return
+    }
+    await supabase.from('event_tables').update({
+      name: editForm.name.trim(),
+      shape: editForm.shape,
+      capacity: newCapacity,
+    }).eq('id', editTable.id)
+    setEditTable(null)
+    load()
+    toast.success('Stolik zaktualizowany!')
   }
 
   const addSelectedToTable = async (tableId: string) => {
@@ -138,6 +164,7 @@ export default function EventTables({ eventId }: { eventId: string }) {
                       </div>
                     </div>
                     <div className="flex gap-1">
+                      <button onClick={() => openEditTable(table)} className="p-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10"><Pencil size={15} /></button>
                       <button onClick={() => { setShowAddGuest(table.id); setSearch(''); setSelected([]) }} className="p-2 rounded-xl bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"><UserPlus size={15} /></button>
                       <button onClick={() => removeTable(table.id)} className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20"><Trash2 size={15} /></button>
                     </div>
@@ -191,6 +218,53 @@ export default function EventTables({ eventId }: { eventId: string }) {
               ))}
             </div>
             <button onClick={addTable} className="btn-primary w-full">Dodaj stolik</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: edytuj stolik */}
+      {editTable && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-end justify-center p-4">
+          <div className="bg-[#13131f] border border-white/10 rounded-3xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-lg text-white">Edytuj stolik</h3>
+              <button onClick={() => setEditTable(null)} className="text-gray-500 hover:text-gray-300"><X size={20} /></button>
+            </div>
+            <input
+              value={editForm.name}
+              onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+              className="input"
+              placeholder="Nazwa stolika"
+              autoFocus
+            />
+            <div className="grid grid-cols-2 gap-3">
+              {([['round', '⭕ Okrągły'], ['rect', '▭ Prostokątny']] as const).map(([val, label]) => (
+                <button key={val} onClick={() => setEditForm({ ...editForm, shape: val })}
+                  className={`py-3 rounded-2xl text-sm font-medium transition-all ${editForm.shape === val ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-400 border border-white/10'}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-2">Pojemność <span className="text-gray-600">(min. {editTable.seats.length} — zajęte miejsca)</span></p>
+              <div className="flex gap-2 flex-wrap">
+                {[4, 6, 8, 10, 12].map(n => (
+                  <button key={n} onClick={() => setEditForm({ ...editForm, capacity: String(n) })}
+                    disabled={n < editTable.seats.length}
+                    className={`w-12 h-12 rounded-2xl font-semibold transition-all disabled:opacity-25 disabled:cursor-not-allowed ${editForm.capacity === String(n) ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-400 border border-white/10'}`}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setEditTable(null)} className="flex-1 py-3 rounded-2xl bg-white/5 text-gray-400 border border-white/10 text-sm font-medium hover:bg-white/10 transition-all">
+                Anuluj
+              </button>
+              <button onClick={saveEditTable} className="flex-1 btn-primary">
+                Zapisz zmiany
+              </button>
+            </div>
           </div>
         </div>
       )}
