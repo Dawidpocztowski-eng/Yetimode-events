@@ -1,51 +1,77 @@
 'use client'
 
 import { Event } from '@/lib/types'
-import { Clock } from 'lucide-react'
+import { format } from 'date-fns'
+import { pl } from 'date-fns/locale'
 
 export default function PublicSchedule({ event }: { event: Event }) {
   const color = event.primary_color || '#8b5cf6'
   const schedule = event.schedule || []
+  const formattedDate = format(new Date(event.date), "d MMMM yyyy", { locale: pl })
 
   return (
-    <section className="min-h-screen py-16 px-4 bg-[#07070f]">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-12">
-          <Clock size={32} className="mx-auto mb-3" style={{ color }} />
-          <h2 className="text-3xl font-bold text-white mb-2">Plan dnia</h2>
-          <p className="text-gray-500">{new Date(event.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+    <section className="min-h-screen pt-14 bg-[#050508] px-4">
+      <div className="max-w-xl mx-auto py-16">
+
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-white/15" />
+            <span className="text-white/20 text-xs tracking-[0.4em] uppercase font-sans">Program</span>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-white/15" />
+          </div>
+          <h2 className="text-4xl font-light text-white mb-3"
+            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+            Plan dnia
+          </h2>
+          <p className="text-white/30 text-sm font-sans">{formattedDate}</p>
         </div>
 
         {schedule.length === 0 ? (
-          <div className="text-center py-10 text-gray-600">
-            <p>Plan dnia zostanie wkrótce opublikowany</p>
+          <div className="text-center py-16">
+            <p className="text-white/20 text-sm font-sans tracking-wider">Plan dnia zostanie wkrótce opublikowany</p>
           </div>
         ) : (
           <div className="relative">
-            {/* Linia czasu */}
-            <div className="absolute left-8 top-0 bottom-0 w-px" style={{ background: `linear-gradient(to bottom, transparent, ${color}40, transparent)` }} />
+            {/* Pionowa linia */}
+            <div className="absolute left-[27px] top-3 bottom-3 w-px"
+              style={{ background: `linear-gradient(to bottom, transparent, ${color}25 15%, ${color}25 85%, transparent)` }} />
 
-            <div className="space-y-5">
+            <div className="space-y-8">
               {schedule.map((item, idx) => (
-                <div key={item.id} className="relative flex gap-5 items-start">
-                  {/* Ikona */}
-                  <div className="relative z-10 flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-lg"
-                    style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
-                    {item.icon || '🎉'}
+                <div key={item.id} className="relative flex gap-6 items-start group">
+                  {/* Kropka na osi */}
+                  <div className="relative flex-shrink-0 flex items-center justify-center w-14">
+                    <div className="w-2 h-2 rounded-full border border-white/20 bg-[#050508] relative z-10 transition-all group-hover:border-white/50"
+                      style={{ boxShadow: `0 0 0 4px #050508` }} />
                   </div>
+
                   {/* Treść */}
-                  <div className="bg-white/5 border border-white/8 rounded-2xl p-4 flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="font-mono font-bold text-sm" style={{ color }}>{item.time}</span>
-                      <h3 className="font-semibold text-white">{item.title}</h3>
+                  <div className="flex-1 pb-2">
+                    <div className="flex items-baseline gap-3 mb-1.5">
+                      <span className="font-sans text-xs tracking-[0.2em] font-medium"
+                        style={{ color: `${color}cc` }}>
+                        {item.time}
+                      </span>
+                      <span className="text-white/20 text-xs">—</span>
+                      <span className="text-white font-sans text-sm font-medium">
+                        {item.icon && <span className="mr-2">{item.icon}</span>}
+                        {item.title}
+                      </span>
                     </div>
-                    {item.description && <p className="text-gray-500 text-sm">{item.description}</p>}
+                    {item.description && (
+                      <p className="text-white/30 text-xs font-sans leading-relaxed pl-0">{item.description}</p>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           </div>
         )}
+
+        <div className="flex items-center justify-center mt-16">
+          <div className="h-px w-32 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        </div>
       </div>
     </section>
   )
