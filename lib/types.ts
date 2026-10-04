@@ -73,7 +73,7 @@ export interface TableItem {
   id: string
   event_id: string
   name: string
-  shape: 'round' | 'rect'
+  shape: 'round' | 'rect' | 'presidential'
   capacity: number
   seats: { id: string; guest_name: string }[]
   created_at: string

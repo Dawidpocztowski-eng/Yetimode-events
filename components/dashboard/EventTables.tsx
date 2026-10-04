@@ -34,8 +34,8 @@ export default function EventTables({ eventId }: { eventId: string }) {
   const [showAddTable, setShowAddTable] = useState(false)
   const [showAddGuest, setShowAddGuest] = useState<string | null>(null)
   const [editTable, setEditTable] = useState<TableItem | null>(null)
-  const [editForm, setEditForm] = useState({ name: '', shape: 'round' as 'round' | 'rect', capacity: '8' })
-  const [newTable, setNewTable] = useState({ name: '', shape: 'round' as 'round' | 'rect', capacity: '8' })
+  const [editForm, setEditForm] = useState({ name: '', shape: 'round' as 'round' | 'rect' | 'presidential', capacity: '8' })
+  const [newTable, setNewTable] = useState({ name: '', shape: 'round' as 'round' | 'rect' | 'presidential', capacity: '8' })
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<string[]>([]) // keys of selected persons
   const supabase = createClient()
@@ -151,7 +151,7 @@ export default function EventTables({ eventId }: { eventId: string }) {
               return (
                 <div key={table.id} className="card p-0 overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-                    <div className={`flex-shrink-0 w-10 h-10 border-2 border-violet-500/40 flex items-center justify-center text-violet-400 text-xs font-bold ${table.shape === 'round' ? 'rounded-full' : 'rounded-lg'}`}>
+                    <div className={`flex-shrink-0 w-10 h-10 border-2 border-violet-500/40 flex items-center justify-center text-violet-400 text-xs font-bold ${table.shape === 'round' ? 'rounded-full' : table.shape === 'presidential' ? 'rounded-sm' : 'rounded-lg'}`}>
                       {table.seats.length}/{table.capacity}
                     </div>
                     <div className="flex-1">
@@ -206,13 +206,13 @@ export default function EventTables({ eventId }: { eventId: string }) {
             </div>
             <input value={newTable.name} onChange={e => setNewTable({ ...newTable, name: e.target.value })} className="input" placeholder="Nazwa stolika" autoFocus />
             <div className="grid grid-cols-2 gap-3">
-              {([['round', '⭕ Okrągły'], ['rect', '▭ Prostokątny']] as const).map(([val, label]) => (
+              {([['round', '⭕ Okrągły'], ['rect', '▭ Prostokątny'], ['presidential', '👑 Prezydialny']] as const).map(([val, label]) => (
                 <button key={val} onClick={() => setNewTable({ ...newTable, shape: val })}
-                  className={`py-3 rounded-2xl text-sm font-medium transition-all ${newTable.shape === val ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-400 border border-white/10'}`}>{label}</button>
+                  className={`py-3 rounded-2xl text-sm font-medium transition-all ${newTable.shape === val ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-400 border border-white/10'} ${val === 'presidential' ? 'col-span-2' : ''}`}>{label}</button>
               ))}
             </div>
             <div className="flex gap-2 flex-wrap">
-              {[4, 6, 8, 10, 12].map(n => (
+              {[2, 4, 6, 8, 10, 12].map(n => (
                 <button key={n} onClick={() => setNewTable({ ...newTable, capacity: String(n) })}
                   className={`w-12 h-12 rounded-2xl font-semibold transition-all ${newTable.capacity === String(n) ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-400 border border-white/10'}`}>{n}</button>
               ))}
@@ -238,9 +238,9 @@ export default function EventTables({ eventId }: { eventId: string }) {
               autoFocus
             />
             <div className="grid grid-cols-2 gap-3">
-              {([['round', '⭕ Okrągły'], ['rect', '▭ Prostokątny']] as const).map(([val, label]) => (
+              {([['round', '⭕ Okrągły'], ['rect', '▭ Prostokątny'], ['presidential', '👑 Prezydialny']] as const).map(([val, label]) => (
                 <button key={val} onClick={() => setEditForm({ ...editForm, shape: val })}
-                  className={`py-3 rounded-2xl text-sm font-medium transition-all ${editForm.shape === val ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-400 border border-white/10'}`}>
+                  className={`py-3 rounded-2xl text-sm font-medium transition-all ${editForm.shape === val ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-400 border border-white/10'} ${val === 'presidential' ? 'col-span-2' : ''}`}>
                   {label}
                 </button>
               ))}
@@ -248,7 +248,7 @@ export default function EventTables({ eventId }: { eventId: string }) {
             <div>
               <p className="text-xs text-gray-500 mb-2">Pojemność <span className="text-gray-600">(min. {editTable.seats.length} — zajęte miejsca)</span></p>
               <div className="flex gap-2 flex-wrap">
-                {[4, 6, 8, 10, 12].map(n => (
+                {[2, 4, 6, 8, 10, 12].map(n => (
                   <button key={n} onClick={() => setEditForm({ ...editForm, capacity: String(n) })}
                     disabled={n < editTable.seats.length}
                     className={`w-12 h-12 rounded-2xl font-semibold transition-all disabled:opacity-25 disabled:cursor-not-allowed ${editForm.capacity === String(n) ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-400 border border-white/10'}`}>
