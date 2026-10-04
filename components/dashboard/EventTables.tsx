@@ -45,10 +45,16 @@ export default function EventTables({ eventId, primaryColor }: { eventId: string
 
   const load = async () => {
     const [tablesRes, guestsRes] = await Promise.all([
-      supabase.from('event_tables').select('*').eq('event_id', eventId).order('sort_order', { ascending: true }).order('created_at'),
+      supabase.from('event_tables').select('*').eq('event_id', eventId).order('created_at'),
       supabase.from('guests').select('*').eq('event_id', eventId),
     ])
-    setTables((tablesRes.data || []).map((t: any) => ({ ...t, seats: t.seats || [] })))
+    const rawTables = (tablesRes.data || []).map((t: any) => ({ ...t, seats: t.seats || [] }))
+    // Sortuj po sort_order jeśli kolumna istnieje, inaczej po created_at (kolejność z bazy)
+    rawTables.sort((a: any, b: any) => {
+      if (a.sort_order != null && b.sort_order != null) return a.sort_order - b.sort_order
+      return 0
+    })
+    setTables(rawTables)
     const guests: Guest[] = (guestsRes.data || []).map((g: any) => ({
       ...g,
       children: g.children || [],
@@ -76,20 +82,26 @@ export default function EventTables({ eventId, primaryColor }: { eventId: string
     const newOrder = [...tables]
     ;[newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]]
     setTables(newOrder)
-    // zapisz sort_order dla obu
-    await Promise.all([
-      supabase.from('event_tables').update({ sort_order: idx }).eq('id', newOrder[idx].id),
-      supabase.from('event_tables').update({ sort_order: swapIdx }).eq('id', newOrder[swapIdx].id),
-    ])
+    // próbuj zapisać sort_order — może nie istnieć jeszcze w tabeli
+    try {
+      await Promise.all([
+        supabase.from('event_tables').update({ sort_order: idx }).eq('id', newOrder[idx].id),
+        supabase.from('event_tables').update({ sort_order: swapIdx }).eq('id', newOrder[swapIdx].id),
+      ])
+    } catch { /* kolumna sort_order nie istnieje — zmiana kolejności tylko lokalnie */ }
   }
 
   const saveCanvasPositions = async (positions: Record<string, { x: number; y: number }>) => {
-    await Promise.all(
-      Object.entries(positions).map(([tableId, pos]) =>
-        supabase.from('event_tables').update({ canvas_x: pos.x, canvas_y: pos.y }).eq('id', tableId)
+    try {
+      await Promise.all(
+        Object.entries(positions).map(([tableId, pos]) =>
+          supabase.from('event_tables').update({ canvas_x: pos.x, canvas_y: pos.y }).eq('id', tableId)
+        )
       )
-    )
-    toast.success('Układ sali zapisany!')
+      toast.success('Układ sali zapisany!')
+    } catch {
+      toast.error('Nie można zapisać pozycji — brakuje kolumn w bazie. Uruchom migrację SQL.')
+    }
     load()
   }
 
