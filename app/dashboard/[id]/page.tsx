@@ -85,7 +85,7 @@ export default function EventPanelPage() {
         {activeTab === 'overview'  && <EventDashboard event={event} />}
         {activeTab === 'guests'    && <EventGuests eventId={event.id} />}
         {activeTab === 'budget'    && <EventBudget eventId={event.id} />}
-        {activeTab === 'tables'    && <EventTables eventId={event.id} />}
+        {activeTab === 'tables'    && <EventTables eventId={event.id} primaryColor={event.primary_color} />}
         {activeTab === 'gallery'   && <EventGallery event={event} />}
         {activeTab === 'advanced'  && (
           <div className="space-y-5">

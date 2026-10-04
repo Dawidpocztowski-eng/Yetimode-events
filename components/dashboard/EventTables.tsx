@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Guest, TableItem } from '@/lib/types'
-import { Plus, Trash2, X, UserPlus, Circle, Users, Pencil } from 'lucide-react'
+import { Plus, Trash2, X, UserPlus, Circle, Users, Pencil, ChevronUp, ChevronDown, LayoutGrid, List } from 'lucide-react'
 import toast from 'react-hot-toast'
+import RoomCanvas from './RoomCanvas'
 
 // Rozwinięta lista wszystkich osób: główny gość + osoba towarzysząca + dzieci
 interface PersonEntry {
@@ -28,7 +29,9 @@ function buildPersonList(guests: Guest[]): PersonEntry[] {
   return list
 }
 
-export default function EventTables({ eventId }: { eventId: string }) {
+export default function EventTables({ eventId, primaryColor }: { eventId: string; primaryColor?: string }) {
+  const color = primaryColor || '#8b5cf6'
+  const [view, setView] = useState<'list' | 'canvas'>('list')
   const [tables, setTables] = useState<TableItem[]>([])
   const [allPersons, setAllPersons] = useState<PersonEntry[]>([])
   const [showAddTable, setShowAddTable] = useState(false)
@@ -42,7 +45,7 @@ export default function EventTables({ eventId }: { eventId: string }) {
 
   const load = async () => {
     const [tablesRes, guestsRes] = await Promise.all([
-      supabase.from('event_tables').select('*').eq('event_id', eventId).order('created_at'),
+      supabase.from('event_tables').select('*').eq('event_id', eventId).order('sort_order', { ascending: true }).order('created_at'),
       supabase.from('guests').select('*').eq('event_id', eventId),
     ])
     setTables((tablesRes.data || []).map((t: any) => ({ ...t, seats: t.seats || [] })))
@@ -63,6 +66,31 @@ export default function EventTables({ eventId }: { eventId: string }) {
   const removeTable = async (id: string) => {
     await supabase.from('event_tables').delete().eq('id', id)
     setTables(prev => prev.filter(t => t.id !== id)); toast.success('Usunięto')
+  }
+
+  const moveTable = async (id: string, dir: 'up' | 'down') => {
+    const idx = tables.findIndex(t => t.id === id)
+    if (dir === 'up' && idx === 0) return
+    if (dir === 'down' && idx === tables.length - 1) return
+    const swapIdx = dir === 'up' ? idx - 1 : idx + 1
+    const newOrder = [...tables]
+    ;[newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]]
+    setTables(newOrder)
+    // zapisz sort_order dla obu
+    await Promise.all([
+      supabase.from('event_tables').update({ sort_order: idx }).eq('id', newOrder[idx].id),
+      supabase.from('event_tables').update({ sort_order: swapIdx }).eq('id', newOrder[swapIdx].id),
+    ])
+  }
+
+  const saveCanvasPositions = async (positions: Record<string, { x: number; y: number }>) => {
+    await Promise.all(
+      Object.entries(positions).map(([tableId, pos]) =>
+        supabase.from('event_tables').update({ canvas_x: pos.x, canvas_y: pos.y }).eq('id', tableId)
+      )
+    )
+    toast.success('Układ sali zapisany!')
+    load()
   }
 
   const openEditTable = (table: TableItem) => {
@@ -125,9 +153,22 @@ export default function EventTables({ eventId }: { eventId: string }) {
           <h2 className="font-bold text-white text-lg">Stoliki</h2>
           <p className="text-xs text-gray-500">{occupied}/{totalSeats} miejsc zajętych · {allPersons.length} osób łącznie</p>
         </div>
-        <button onClick={() => setShowAddTable(true)} className="btn-primary py-2 px-4 text-sm">
-          <Plus size={16} /> Dodaj stolik
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Przełącznik widoku */}
+          <div className="flex bg-white/5 border border-white/10 rounded-xl p-0.5">
+            <button onClick={() => setView('list')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${view === 'list' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'}`}>
+              <List size={13} /> Lista
+            </button>
+            <button onClick={() => setView('canvas')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${view === 'canvas' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'}`}>
+              <LayoutGrid size={13} /> Wizualizacja
+            </button>
+          </div>
+          <button onClick={() => setShowAddTable(true)} className="btn-primary py-2 px-4 text-sm">
+            <Plus size={16} /> Dodaj stolik
+          </button>
+        </div>
       </div>
 
       {tables.length > 0 && (
@@ -141,60 +182,83 @@ export default function EventTables({ eventId }: { eventId: string }) {
         </div>
       )}
 
-      {tables.length === 0
-        ? <p className="text-center text-gray-500 text-sm py-8">Dodaj pierwszy stolik</p>
-        : (
-          <div className="space-y-3">
-            {tables.map(table => {
-              const free = table.capacity - table.seats.length
-              const pct = (table.seats.length / table.capacity) * 100
-              return (
-                <div key={table.id} className="card p-0 overflow-hidden">
-                  <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-                    <div className={`flex-shrink-0 w-10 h-10 border-2 border-violet-500/40 flex items-center justify-center text-violet-400 text-xs font-bold ${table.shape === 'round' ? 'rounded-full' : table.shape === 'presidential' ? 'rounded-sm' : 'rounded-lg'}`}>
-                      {table.seats.length}/{table.capacity}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-white text-sm">{table.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${pct >= 100 ? 'bg-red-400' : pct > 70 ? 'bg-amber-400' : 'bg-green-400'}`} style={{ width: `${pct}%` }} />
+      {/* WIDOK: Lista */}
+      {view === 'list' && (
+        <>
+          {tables.length === 0
+            ? <p className="text-center text-gray-500 text-sm py-8">Dodaj pierwszy stolik</p>
+            : (
+              <div className="space-y-3">
+                {tables.map((table, idx) => {
+                  const free = table.capacity - table.seats.length
+                  const pct = (table.seats.length / table.capacity) * 100
+                  return (
+                    <div key={table.id} className="card p-0 overflow-hidden">
+                      <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
+                        {/* Strzałki kolejności */}
+                        <div className="flex flex-col gap-0.5">
+                          <button onClick={() => moveTable(table.id, 'up')} disabled={idx === 0}
+                            className="p-0.5 text-gray-600 hover:text-gray-300 disabled:opacity-20 disabled:cursor-not-allowed transition-colors">
+                            <ChevronUp size={14} />
+                          </button>
+                          <button onClick={() => moveTable(table.id, 'down')} disabled={idx === tables.length - 1}
+                            className="p-0.5 text-gray-600 hover:text-gray-300 disabled:opacity-20 disabled:cursor-not-allowed transition-colors">
+                            <ChevronDown size={14} />
+                          </button>
                         </div>
-                        <span className="text-xs text-gray-500">{free} wolnych</span>
+                        <div className={`flex-shrink-0 w-10 h-10 border-2 border-violet-500/40 flex items-center justify-center text-violet-400 text-xs font-bold ${table.shape === 'round' ? 'rounded-full' : table.shape === 'presidential' ? 'rounded-sm' : 'rounded-lg'}`}>
+                          {table.seats.length}/{table.capacity}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-white text-sm">{table.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                              <div className={`h-full rounded-full ${pct >= 100 ? 'bg-red-400' : pct > 70 ? 'bg-amber-400' : 'bg-green-400'}`} style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="text-xs text-gray-500">{free} wolnych</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <button onClick={() => openEditTable(table)} className="p-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10"><Pencil size={15} /></button>
+                          <button onClick={() => { setShowAddGuest(table.id); setSearch(''); setSelected([]) }} className="p-2 rounded-xl bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"><UserPlus size={15} /></button>
+                          <button onClick={() => removeTable(table.id)} className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20"><Trash2 size={15} /></button>
+                        </div>
+                      </div>
+                      <div className="px-4 py-3">
+                        {table.seats.length === 0
+                          ? <p className="text-xs text-gray-600 text-center py-1">Brak gości</p>
+                          : (
+                            <div className="flex flex-wrap gap-2">
+                              {table.seats.map(seat => (
+                                <div key={seat.id} className="flex items-center gap-1.5 bg-violet-500/15 text-violet-300 px-3 py-1.5 rounded-full text-xs font-medium">
+                                  {seat.guest_name}
+                                  <button onClick={() => removeGuestFromTable(table.id, seat.id)} className="text-violet-500 hover:text-red-400"><X size={11} /></button>
+                                </div>
+                              ))}
+                              {Array.from({ length: free }).map((_, i) => (
+                                <div key={`e${i}`} className="flex items-center gap-1 border border-dashed border-white/10 text-gray-600 px-3 py-1.5 rounded-full text-xs">
+                                  <Circle size={9} /> wolne
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        }
                       </div>
                     </div>
-                    <div className="flex gap-1">
-                      <button onClick={() => openEditTable(table)} className="p-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10"><Pencil size={15} /></button>
-                      <button onClick={() => { setShowAddGuest(table.id); setSearch(''); setSelected([]) }} className="p-2 rounded-xl bg-violet-500/10 text-violet-400 hover:bg-violet-500/20"><UserPlus size={15} /></button>
-                      <button onClick={() => removeTable(table.id)} className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20"><Trash2 size={15} /></button>
-                    </div>
-                  </div>
-                  <div className="px-4 py-3">
-                    {table.seats.length === 0
-                      ? <p className="text-xs text-gray-600 text-center py-1">Brak gości</p>
-                      : (
-                        <div className="flex flex-wrap gap-2">
-                          {table.seats.map(seat => (
-                            <div key={seat.id} className="flex items-center gap-1.5 bg-violet-500/15 text-violet-300 px-3 py-1.5 rounded-full text-xs font-medium">
-                              {seat.guest_name}
-                              <button onClick={() => removeGuestFromTable(table.id, seat.id)} className="text-violet-500 hover:text-red-400"><X size={11} /></button>
-                            </div>
-                          ))}
-                          {Array.from({ length: free }).map((_, i) => (
-                            <div key={`e${i}`} className="flex items-center gap-1 border border-dashed border-white/10 text-gray-600 px-3 py-1.5 rounded-full text-xs">
-                              <Circle size={9} /> wolne
-                            </div>
-                          ))}
-                        </div>
-                      )
-                    }
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )
-      }
+                  )
+                })}
+              </div>
+            )
+          }
+        </>
+      )}
+
+      {/* WIDOK: Wizualizacja sali */}
+      {view === 'canvas' && (
+        tables.length === 0
+          ? <p className="text-center text-gray-500 text-sm py-8">Dodaj najpierw stoliki w widoku listy</p>
+          : <RoomCanvas tables={tables} primaryColor={color} onSavePositions={saveCanvasPositions} />
+      )}
 
       {/* Modal: dodaj stolik */}
       {showAddTable && (

@@ -76,6 +76,9 @@ export interface TableItem {
   shape: 'round' | 'rect' | 'presidential'
   capacity: number
   seats: { id: string; guest_name: string }[]
+  sort_order?: number
+  canvas_x?: number
+  canvas_y?: number
   created_at: string
 }
 
