@@ -69,6 +69,44 @@ export default function EventDashboard({ event }: { event: Event }) {
   const rsvpNames = new Set(rsvps.filter(r => r.attending).map(r => `${r.first_name} ${r.last_name}`.toLowerCase().trim()))
   const confirmedFromList = guests.filter(g => rsvpNames.has(g.name.toLowerCase().trim())).length
   const confirmPct = guests.length > 0 ? Math.round((Math.max(confirmedFromList, attending.length) / guests.length) * 100) : attending.length > 0 ? 100 : 0
+  const [quickConfirm, setQuickConfirm] = useState<any | null>(null)
+  const [quickForm, setQuickForm] = useState({ attending: 'yes', guests: '1', accommodation: '', transport: '', dietary: '', notes: '' })
+  const [quickLoading, setQuickLoading] = useState(false)
+
+  const openQuickConfirm = (guest: any) => {
+    setQuickConfirm(guest)
+    // Prefill: dla gościa z osobą towarzyszącą domyślnie 2 osoby
+    const defaultGuests = guest.companion_name ? '2' : '1'
+    setQuickForm({ attending: 'yes', guests: defaultGuests, accommodation: '', transport: '', dietary: '', notes: '' })
+  }
+
+  const saveQuickConfirm = async () => {
+    if (!quickConfirm) return
+    setQuickLoading(true)
+    const nameParts = quickConfirm.name.trim().split(' ')
+    const firstName = nameParts[0] || quickConfirm.name
+    const lastName = nameParts.slice(1).join(' ') || ''
+    const { error } = await supabase.from('rsvp_entries').insert({
+      event_id: event.id,
+      first_name: firstName,
+      last_name: lastName,
+      attending: quickForm.attending === 'yes',
+      guests_count: parseInt(quickForm.guests) || 1,
+      accommodation: quickForm.accommodation === 'yes',
+      transport: quickForm.transport === 'yes',
+      dietary_needs: quickForm.dietary || null,
+      notes: quickForm.notes || null,
+    })
+    if (!error) {
+      toast.success(`Potwierdzono: ${quickConfirm.name}`)
+      setQuickConfirm(null)
+      load()
+    } else {
+      toast.error('Błąd zapisu')
+    }
+    setQuickLoading(false)
+  }
+
   const copyLink = () => { navigator.clipboard.writeText(eventUrl); toast.success('Link skopiowany!') }
 
   // Pobierz QR jako PNG 1000×1000 — gotowy do druku
@@ -293,15 +331,121 @@ export default function EventDashboard({ event }: { event: Event }) {
           <p className="text-xs text-gray-500 mb-4">Goście z listy, którzy jeszcze nie potwierdzili obecności</p>
           <div className="space-y-1">
             {unconfirmedGuests.map(g => (
-              <div key={g.id} className="flex items-center gap-3 py-2 border-b border-white/5 last:border-0">
-                <div className="w-5 h-5 rounded-full border-2 border-gray-600 flex-shrink-0" />
+              <div key={g.id} className="flex items-center gap-3 py-2.5 border-b border-white/5 last:border-0 group">
+                <div className="w-5 h-5 rounded-full border-2 border-gray-600 flex-shrink-0 group-hover:border-gray-400 transition-colors" />
                 <span className="text-sm text-gray-300 flex-1">{g.name}</span>
                 {g.companion_name && <span className="text-xs text-gray-600">+1</span>}
                 <span className={`text-xs ${{ family: 'text-rose-400', friends: 'text-blue-400', vendors: 'text-purple-400' }[g.group_type as string] || 'text-gray-500'}`}>
                   {{ family: 'Rodzina', friends: 'Znajomi', vendors: 'Wykonawcy' }[g.group_type as string] || g.group_type}
                 </span>
+                <button
+                  onClick={() => openQuickConfirm(g)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 text-xs font-medium border border-green-500/20 flex-shrink-0"
+                >
+                  <CheckCircle size={12} /> Potwierdź
+                </button>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modal szybkiego potwierdzenia z poziomu panelu */}
+      {quickConfirm && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-end justify-center p-4">
+          <div className="bg-[#101828] border border-white/10 rounded-3xl w-full max-w-sm p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-lg text-white">Potwierdź za gościa</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{quickConfirm.name}</p>
+              </div>
+              <button onClick={() => setQuickConfirm(null)} className="text-gray-500 hover:text-gray-300"><X size={20} /></button>
+            </div>
+
+            {/* Obecność */}
+            <div>
+              <label className="label">Obecność</label>
+              <div className="flex gap-2">
+                {[{ v: 'yes', l: '✓ Będzie' }, { v: 'no', l: '✗ Nie będzie' }].map(({ v, l }) => (
+                  <button key={v} onClick={() => setQuickForm(f => ({ ...f, attending: v }))}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      quickForm.attending === v
+                        ? v === 'yes' ? 'bg-green-500/20 border border-green-500/30 text-green-400' : 'bg-red-500/15 border border-red-500/25 text-red-400'
+                        : 'bg-white/5 border border-white/10 text-gray-400'
+                    }`}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {quickForm.attending === 'yes' && (
+              <>
+                {/* Liczba osób */}
+                <div>
+                  <label className="label">Liczba osób</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {[1, 2, 3, 4].map(n => (
+                      <button key={n} onClick={() => setQuickForm(f => ({ ...f, guests: String(n) }))}
+                        className={`w-12 h-12 rounded-xl text-sm font-semibold transition-all ${
+                          quickForm.guests === String(n) ? 'bg-violet-600 text-white' : 'bg-white/5 border border-white/10 text-gray-400'
+                        }`}>{n}</button>
+                    ))}
+                  </div>
+                  {quickConfirm.companion_name && (
+                    <p className="text-xs text-gray-600 mt-1.5">Osoba towarzysząca: <span className="text-gray-400">{quickConfirm.companion_name}</span></p>
+                  )}
+                  {(quickConfirm.children || []).length > 0 && (
+                    <p className="text-xs text-gray-600 mt-0.5">Dzieci: <span className="text-gray-400">{(quickConfirm.children || []).map((c: any) => c.name).join(', ')}</span></p>
+                  )}
+                </div>
+
+                {/* Nocleg */}
+                <div>
+                  <label className="label">Nocleg?</label>
+                  <div className="flex gap-2">
+                    {[{ v: 'yes', l: 'Tak' }, { v: 'no', l: 'Nie' }].map(({ v, l }) => (
+                      <button key={v} onClick={() => setQuickForm(f => ({ ...f, accommodation: v }))}
+                        className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${quickForm.accommodation === v ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'bg-white/5 border border-white/10 text-gray-400'}`}>
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Transport */}
+                <div>
+                  <label className="label">Transport?</label>
+                  <div className="flex gap-2">
+                    {[{ v: 'yes', l: 'Tak' }, { v: 'no', l: 'Nie' }].map(({ v, l }) => (
+                      <button key={v} onClick={() => setQuickForm(f => ({ ...f, transport: v }))}
+                        className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${quickForm.transport === v ? 'bg-amber-500/20 border border-amber-500/30 text-amber-400' : 'bg-white/5 border border-white/10 text-gray-400'}`}>
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Dieta */}
+                <div>
+                  <label className="label">Dieta / alergie</label>
+                  <input value={quickForm.dietary} onChange={e => setQuickForm(f => ({ ...f, dietary: e.target.value }))}
+                    className="input" placeholder="np. wegetarianin, gluten..." />
+                </div>
+              </>
+            )}
+
+            {/* Uwagi */}
+            <div>
+              <label className="label">Uwagi</label>
+              <textarea value={quickForm.notes} onChange={e => setQuickForm(f => ({ ...f, notes: e.target.value }))}
+                rows={2} className="input resize-none" />
+            </div>
+
+            <button onClick={saveQuickConfirm} disabled={quickLoading} className="btn-primary w-full">
+              <CheckCircle size={16} />
+              {quickLoading ? 'Zapisywanie...' : `Potwierdź: ${quickConfirm.name}`}
+            </button>
           </div>
         </div>
       )}
