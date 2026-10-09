@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Event } from '@/lib/types'
-import { Users, CheckCircle, ExternalLink, QrCode, Copy, ChevronDown, ChevronUp, Bed, Car, XCircle, Clock, Trash2, Pencil, X, Save } from 'lucide-react'
+import { Users, CheckCircle, ExternalLink, QrCode, Copy, ChevronDown, ChevronUp, Bed, Car, XCircle, Clock, Trash2, Pencil, X, Save, Download } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
@@ -70,6 +70,57 @@ export default function EventDashboard({ event }: { event: Event }) {
   const confirmedFromList = guests.filter(g => rsvpNames.has(g.name.toLowerCase().trim())).length
   const confirmPct = guests.length > 0 ? Math.round((Math.max(confirmedFromList, attending.length) / guests.length) * 100) : attending.length > 0 ? 100 : 0
   const copyLink = () => { navigator.clipboard.writeText(eventUrl); toast.success('Link skopiowany!') }
+
+  // Pobierz QR jako PNG 1000×1000 — gotowy do druku
+  const downloadQRPng = (url: string, slug: string) => {
+    const SIZE = 1000
+    const PADDING = 40
+    const canvas = document.createElement('canvas')
+    canvas.width = SIZE
+    canvas.height = SIZE
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, SIZE, SIZE)
+
+    // Renderuj SVG QR do obrazu
+    const svgEl = document.getElementById('qr-preview-svg') as unknown as SVGSVGElement
+    if (!svgEl) { toast.error('Nie znaleziono kodu QR'); return }
+    const svgData = new XMLSerializer().serializeToString(svgEl)
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+    const svgUrl = URL.createObjectURL(svgBlob)
+    const img = new Image()
+    img.onload = () => {
+      ctx.drawImage(img, PADDING, PADDING, SIZE - PADDING * 2, SIZE - PADDING * 2)
+      URL.revokeObjectURL(svgUrl)
+      const link = document.createElement('a')
+      link.download = `qr-rsvp-${slug}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+      toast.success('PNG pobrany!')
+    }
+    img.src = svgUrl
+  }
+
+  // Pobierz QR jako SVG — dla grafika (wektorowy, skalowalny)
+  const downloadQRSvg = (url: string, slug: string) => {
+    const svgEl = document.getElementById('qr-preview-svg') as unknown as SVGSVGElement
+    if (!svgEl) { toast.error('Nie znaleziono kodu QR'); return }
+
+    // Klonuj i ustaw rozmiar na 1000×1000 dla grafika
+    const clone = svgEl.cloneNode(true) as SVGSVGElement
+    clone.setAttribute('width', '1000')
+    clone.setAttribute('height', '1000')
+    clone.setAttribute('viewBox', `0 0 ${svgEl.getAttribute('width') || 200} ${svgEl.getAttribute('height') || 200}`)
+
+    const svgData = new XMLSerializer().serializeToString(clone)
+    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+    const link = document.createElement('a')
+    link.download = `qr-rsvp-${slug}.svg`
+    link.href = URL.createObjectURL(blob)
+    link.click()
+    URL.revokeObjectURL(link.href)
+    toast.success('SVG pobrany!')
+  }
 
   return (
     <div className="space-y-5">
@@ -138,11 +189,55 @@ export default function EventDashboard({ event }: { event: Event }) {
           {showQR ? <ChevronUp size={18} className="text-gray-500" /> : <ChevronDown size={18} className="text-gray-500" />}
         </button>
         {showQR && (
-          <div className="flex flex-col items-center pt-5 gap-3">
+          <div className="flex flex-col items-center pt-5 gap-4">
+            {/* Podgląd — czarny QR */}
             <div className="bg-white p-4 rounded-2xl shadow-md">
-              <QRCodeSVG value={eventUrl} size={180} fgColor={event.primary_color} level="H" />
+              <QRCodeSVG
+                id="qr-preview-svg"
+                value={eventUrl}
+                size={200}
+                fgColor="#000000"
+                bgColor="#ffffff"
+                level="H"
+              />
             </div>
             <p className="text-xs text-gray-500">Kod galerii: <strong className="text-gray-300">{event.gallery_code}</strong></p>
+            <p className="text-xs text-gray-600 text-center max-w-xs">
+              URL: <span className="text-gray-400 break-all">{eventUrl}</span>
+            </p>
+
+            {/* Przyciski pobierania */}
+            <div className="w-full space-y-2 pt-1">
+              {/* PNG — wysoka rozdzielczość dla drukarni */}
+              <button
+                onClick={() => downloadQRPng(eventUrl, event.slug)}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-left group"
+              >
+                <div className="w-9 h-9 rounded-lg bg-violet-500/15 flex items-center justify-center flex-shrink-0">
+                  <Download size={16} className="text-violet-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white">Pobierz PNG (1000×1000 px)</p>
+                  <p className="text-xs text-gray-500">Do druku na zaproszeniach — wysoka jakość</p>
+                </div>
+                <span className="text-xs text-gray-600 font-mono flex-shrink-0">.png</span>
+              </button>
+
+              {/* SVG — dla grafika */}
+              <button
+                onClick={() => downloadQRSvg(eventUrl, event.slug)}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-left"
+              >
+                <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                  <Download size={16} className="text-blue-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white">Pobierz SVG (wektorowy)</p>
+                  <p className="text-xs text-gray-500">Dla grafika — skalowalny do dowolnego rozmiaru</p>
+                </div>
+                <span className="text-xs text-gray-600 font-mono flex-shrink-0">.svg</span>
+              </button>
+            </div>
           </div>
         )}
       </div>
