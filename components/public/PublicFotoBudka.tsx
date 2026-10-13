@@ -251,13 +251,13 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
 
         {/* Mode toggle */}
         <div className="flex justify-center mb-6">
-          <div className="flex border border-white/8 rounded-full p-0.5 gap-0.5">
+          <div className="flex border border-stone-200 rounded-full p-0.5 gap-0.5 bg-white/60">
             {(['camera', 'upload'] as const).map(m => (
               <button key={m} onClick={() => { setMode(m); setPhoto(null) }}
-                className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-sans tracking-[0.1em] uppercase transition-all ${
-                  mode === m ? 'text-white' : 'text-white/25 hover:text-white/50'
-                }`}
-                style={mode === m ? { backgroundColor: `${color}30`, color } : {}}>
+                className="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-sans tracking-[0.1em] uppercase transition-all"
+                style={mode === m
+                  ? { backgroundColor: '#c9a84c', color: 'white' }
+                  : { color: '#a8977a' }}>
                 {m === 'camera' ? <><Camera size={12} /> Kamera</> : <><Upload size={12} /> Wgraj</>}
               </button>
             ))}
@@ -268,17 +268,17 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
         <div className="flex gap-2 justify-center mb-6 flex-wrap">
           {FRAMES.map(f => (
             <button key={f.id} onClick={() => setFrame(f.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-sans transition-all border ${
-                frame === f.id ? 'text-white border-white/20' : 'text-white/25 border-white/8 hover:border-white/15'
-              }`}
-              style={frame === f.id ? { backgroundColor: `${color}20`, borderColor: `${color}40` } : {}}>
+              className="px-3 py-1.5 rounded-full text-xs font-sans transition-all border-2 font-medium"
+              style={frame === f.id
+                ? { backgroundColor: '#c9a84c', borderColor: '#c9a84c', color: 'white' }
+                : { backgroundColor: 'white', borderColor: 'rgba(201,168,76,0.3)', color: '#8a7055' }}>
               {f.label}
             </button>
           ))}
         </div>
 
         {/* Camera / upload area */}
-        <div className="rounded-2xl overflow-hidden border border-white/8 bg-black/20">
+        <div className="rounded-2xl overflow-hidden border-2 bg-stone-100" style={{ borderColor: 'rgba(201,168,76,0.25)' }}>
           {!photo ? (
             mode === 'camera' ? (
               <div className="relative bg-black">
@@ -289,17 +289,18 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
                 {getOverlay()}
                 {cameraReady && (
                   <button onClick={capture}
-                    className="absolute bottom-5 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full bg-white/90 hover:bg-white transition-all" />
+                    className="absolute bottom-5 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full border-2 border-white/60 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all flex items-center justify-center z-20">
+                    <div className="w-10 h-10 rounded-full bg-white transition-all" />
                   </button>
                 )}
               </div>
             ) : (
-              <div className="p-4 space-y-4">
-                <label className="flex flex-col items-center justify-center h-44 border border-dashed border-white/10 rounded-xl cursor-pointer hover:border-white/20 transition-colors">
-                  <Upload size={28} className="text-white/15 mb-3" />
-                  <span className="text-white/30 text-sm font-sans">Kliknij aby wybrać zdjęcia</span>
-                  <span className="text-white/15 text-xs font-sans mt-1">Możesz wybrać wiele plików</span>
+              <div className="p-4 space-y-4 bg-white/40">
+                <label className="flex flex-col items-center justify-center h-44 border-2 border-dashed rounded-xl cursor-pointer hover:bg-white/60 transition-colors"
+                  style={{ borderColor: 'rgba(201,168,76,0.3)' }}>
+                  <Upload size={28} className="mb-3" style={{ color: '#c9a84c' }} />
+                  <span className="text-stone-500 text-sm font-sans">Kliknij aby wybrać zdjęcia</span>
+                  <span className="text-stone-300 text-xs font-sans mt-1">Możesz wybrać wiele plików</span>
                   <input type="file" accept="image/*" multiple onChange={handleFile} className="hidden" />
                 </label>
 
@@ -319,20 +320,20 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
                     </div>
 
                     {uploadProgress && (
-                      <div className="h-px w-full bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-1 w-full bg-stone-200 rounded-full overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-300"
-                          style={{ width: `${(uploadProgress.done / uploadProgress.total) * 100}%`, backgroundColor: color }} />
+                          style={{ width: `${(uploadProgress.done / uploadProgress.total) * 100}%`, backgroundColor: '#c9a84c' }} />
                       </div>
                     )}
 
                     <div className="flex gap-2">
                       <button onClick={() => setUploadedFiles([])} disabled={uploading}
-                        className="flex-1 flex items-center justify-center gap-2 border border-white/8 text-white/30 rounded-xl py-3 hover:border-white/15 hover:text-white/50 transition-all text-xs font-sans">
+                        className="flex-1 flex items-center justify-center gap-2 border-2 border-stone-200 text-stone-400 rounded-xl py-3 hover:border-stone-300 transition-all text-xs font-sans bg-white">
                         <X size={13} /> Wyczyść
                       </button>
                       <button onClick={uploadAllFiles} disabled={uploading}
                         className="flex-1 flex items-center justify-center gap-2 text-white rounded-xl py-3 text-xs font-sans font-medium transition-all"
-                        style={{ backgroundColor: `${color}cc` }}>
+                        style={{ backgroundColor: '#c9a84c' }}>
                         {uploading
                           ? <><RefreshCw size={13} className="animate-spin" /> {uploadProgress ? `${uploadProgress.done}/${uploadProgress.total}` : '...'}</>
                           : <><Send size={13} /> Dodaj {uploadedFiles.length} zdjęć</>}
@@ -349,14 +350,14 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
                 <img src={photo} alt="Podgląd" className="w-full block" />
                 {getOverlay()}
               </div>
-              <div className="flex gap-2 p-3">
+              <div className="flex gap-2 p-3 bg-white/60">
                 <button onClick={() => setPhoto(null)}
-                  className="flex-1 flex items-center justify-center gap-2 border border-white/8 text-white/30 rounded-xl py-3 hover:border-white/15 hover:text-white/50 transition-all text-xs font-sans">
+                  className="flex-1 flex items-center justify-center gap-2 border-2 border-stone-200 text-stone-400 rounded-xl py-3 hover:border-stone-300 transition-all text-xs font-sans bg-white">
                   <X size={13} /> Nowe
                 </button>
                 <button onClick={uploadPhoto} disabled={uploading}
                   className="flex-1 flex items-center justify-center gap-2 text-white rounded-xl py-3 text-xs font-sans font-medium transition-all"
-                  style={{ backgroundColor: `${color}cc` }}>
+                  style={{ backgroundColor: '#c9a84c' }}>
                   {uploading ? <RefreshCw size={13} className="animate-spin" /> : <Send size={13} />}
                   {uploading ? 'Wysyłanie...' : 'Dodaj do galerii'}
                 </button>
@@ -365,8 +366,9 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
           )}
         </div>
 
-        <div className="flex items-center justify-center mt-14">
-          <div className="h-px w-32 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="flex items-center justify-center mt-10 gap-4 opacity-40">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/plane-heart.png" alt="" aria-hidden="true" className="w-16 object-contain" />
         </div>
       </div>
     </section>

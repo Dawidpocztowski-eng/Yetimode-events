@@ -62,17 +62,16 @@ export default function PublicRSVP({ event }: { event: Event }) {
     </div>
   )
 
-  const inputClass = "w-full bg-transparent border-b py-3 text-sm font-sans placeholder-stone-300 outline-none transition-all text-stone-700"
-  const inputStyle = { borderColor: `${gold}40` }
-  const inputFocus = `focus:border-[${gold}]`
+  const inputClass = "w-full bg-white/70 border border-stone-200 rounded-xl px-4 py-3 text-sm font-sans placeholder-stone-300 outline-none transition-all text-stone-700 focus:border-stone-400 focus:bg-white"
 
   const OptionButton = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button type="button" onClick={onClick}
-      className="flex-1 py-3 text-sm font-sans border transition-all duration-200"
+      className="flex-1 py-3.5 text-sm font-sans font-medium border-2 rounded-xl transition-all duration-200"
       style={{
-        borderColor: active ? gold : `${gold}30`,
-        backgroundColor: active ? `${gold}15` : 'transparent',
-        color: active ? '#1a1008' : '#a8977a',
+        borderColor: active ? gold : 'rgba(0,0,0,0.1)',
+        backgroundColor: active ? gold : 'white',
+        color: active ? '#ffffff' : '#5a4a35',
+        boxShadow: active ? `0 4px 12px ${gold}40` : 'none',
       }}>
       {children}
     </button>
@@ -127,12 +126,12 @@ export default function PublicRSVP({ event }: { event: Event }) {
             <div>
               <label className="block text-xs tracking-[0.25em] uppercase font-sans mb-2" style={{ color: `${gold}80` }}>Imię *</label>
               <input value={form.firstName} onChange={e => set('firstName', e.target.value)}
-                className={inputClass} style={inputStyle} placeholder="Jan" />
+                className={inputClass} placeholder="Jan" />
             </div>
             <div>
               <label className="block text-xs tracking-[0.25em] uppercase font-sans mb-2" style={{ color: `${gold}80` }}>Nazwisko *</label>
               <input value={form.lastName} onChange={e => set('lastName', e.target.value)}
-                className={inputClass} style={inputStyle} placeholder="Kowalski" />
+                className={inputClass} placeholder="Kowalski" />
             </div>
           </div>
 
@@ -202,7 +201,7 @@ export default function PublicRSVP({ event }: { event: Event }) {
                   Dieta / alergie
                 </label>
                 <input value={form.dietary} onChange={e => set('dietary', e.target.value)}
-                  className={inputClass} style={inputStyle} placeholder="np. wegetarianin, gluten..." />
+                  className={inputClass} placeholder="np. wegetarianin, gluten..." />
               </div>
             </>
           )}
@@ -213,7 +212,7 @@ export default function PublicRSVP({ event }: { event: Event }) {
               Uwagi dla załogi
             </label>
             <textarea value={form.notes} onChange={e => set('notes', e.target.value)}
-              rows={2} className={`${inputClass} resize-none`} style={inputStyle} />
+              rows={2} className={`${inputClass} resize-none`} />
           </div>
 
           {/* Linia perforowana */}
