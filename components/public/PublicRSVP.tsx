@@ -82,19 +82,15 @@ export default function PublicRSVP({ event }: { event: Event }) {
     <section className="min-h-screen pt-14 px-4 overflow-hidden"
       style={{ backgroundColor: '#faf8f3', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
 
-      {/* Dekoracja — mapa i samolot w tle */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.04]">
-        <svg viewBox="0 0 1200 600" className="absolute bottom-0 left-0 w-full h-auto">
-          <g fill="#c9a84c">
-            <ellipse cx="580" cy="200" rx="80" ry="70" />
-            <ellipse cx="820" cy="210" rx="160" ry="90" />
-            <ellipse cx="590" cy="360" rx="70" ry="100" />
-            <ellipse cx="230" cy="230" rx="120" ry="100" />
-            <ellipse cx="300" cy="400" rx="70" ry="110" />
-            <ellipse cx="950" cy="400" rx="80" ry="60" />
-          </g>
-        </svg>
-      </div>
+      {/* Tekstura pergaminu w tle */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/texture-parchment.png" alt="" aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover opacity-[0.18] pointer-events-none select-none" />
+
+      {/* Mapa świata w tle */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/map-world.png" alt="" aria-hidden="true"
+        className="absolute bottom-0 left-0 right-0 w-full object-cover opacity-[0.06] pointer-events-none select-none" />
 
       <div className="relative max-w-lg mx-auto py-16">
 

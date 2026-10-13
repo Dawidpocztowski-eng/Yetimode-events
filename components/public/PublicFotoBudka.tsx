@@ -111,28 +111,20 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
     const gold = '#c9a84c'
 
     switch (frame) {
-      // NAKŁADKA: Paszport ślubny — kremowe tło na górze i dole, styl dokumentu
+      // NAKŁADKA: Paszport ślubny — prawdziwa ramka + belki
       case 'passport': return (
         <div className="absolute inset-0 pointer-events-none">
-          {/* Górna belka — styl paszportu */}
-          <div className="absolute top-0 left-0 right-0 px-4 py-3"
-            style={{ background: 'linear-gradient(to bottom, rgba(250,248,243,0.97), rgba(250,248,243,0.85) 70%, transparent)' }}>
-            <p className="text-center font-serif font-light tracking-[0.3em] text-xs uppercase"
-              style={{ color: gold }}>✈ Wedding Pass · 1 Klasa</p>
-          </div>
-          {/* Dolna belka */}
+          {/* Ramka podróżnicza */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/frame-travel.png" alt="" className="absolute inset-0 w-full h-full object-fill opacity-90" />
+          {/* Dolna belka z imieniem */}
           <div className="absolute bottom-0 left-0 right-0 px-4 py-4"
-            style={{ background: 'linear-gradient(to top, rgba(250,248,243,0.97), rgba(250,248,243,0.85) 70%, transparent)' }}>
+            style={{ background: 'linear-gradient(to top, rgba(250,248,243,0.95), rgba(250,248,243,0.7) 70%, transparent)' }}>
             <p className="text-center font-serif font-semibold tracking-[0.08em]"
               style={{ fontSize: 'clamp(14px, 4vw, 20px)', color: '#1a1008' }}>{name}</p>
             <p className="text-center font-sans text-xs tracking-[0.2em] mt-0.5"
               style={{ color: `${gold}cc` }}>{dateStr}</p>
           </div>
-          {/* Narożniki — styl biletu */}
-          <div className="absolute top-2 left-2 w-5 h-5 border-t border-l" style={{ borderColor: `${gold}80` }} />
-          <div className="absolute top-2 right-2 w-5 h-5 border-t border-r" style={{ borderColor: `${gold}80` }} />
-          <div className="absolute bottom-2 left-2 w-5 h-5 border-b border-l" style={{ borderColor: `${gold}80` }} />
-          <div className="absolute bottom-2 right-2 w-5 h-5 border-b border-r" style={{ borderColor: `${gold}80` }} />
         </div>
       )
 
@@ -206,44 +198,29 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
         </div>
       )
 
-      // NAKŁADKA: Mapa świata — tło z mapą i samolotem
+      // NAKŁADKA: Mapa świata — prawdziwy obraz mapy
       case 'map': return (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Mapa w tle */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-15">
-            <svg viewBox="0 0 1200 600" className="w-full h-full">
-              <g fill={gold}>
-                <ellipse cx="580" cy="200" rx="80" ry="70" />
-                <ellipse cx="820" cy="210" rx="160" ry="90" />
-                <ellipse cx="590" cy="360" rx="70" ry="100" />
-                <ellipse cx="230" cy="230" rx="120" ry="100" />
-                <ellipse cx="300" cy="400" rx="70" ry="110" />
-                <ellipse cx="950" cy="400" rx="80" ry="60" />
-              </g>
-            </svg>
-          </div>
-          {/* Samolot z sercem */}
-          <div className="absolute top-1/3 left-1/4">
-            <svg width="120" height="70" viewBox="0 0 120 70" opacity="0.5">
-              <path d="M 10 55 Q 25 20 50 42 Q 65 55 58 30 L 108 10"
-                stroke="white" strokeWidth="1.5" fill="none" strokeDasharray="4 3" />
-              <text x="102" y="13" fontSize="14" fill="white" transform="rotate(-30, 108, 10)">✈</text>
-            </svg>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/map-world.png" alt="" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+          {/* Samolot */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/plane-heart.png" alt="" className="absolute top-1/4 left-1/4 w-24 opacity-60" />
           {/* Górna belka */}
           <div className="absolute top-0 left-0 right-0 px-4 py-3"
-            style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)' }}>
-            <p className="text-white text-xs font-sans tracking-[0.5em] text-center uppercase opacity-80">
+            style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.65), transparent)' }}>
+            <p className="text-white text-xs font-sans tracking-[0.4em] uppercase text-center opacity-90">
               Widzimy się na miejscu...
             </p>
           </div>
           {/* Dolna belka */}
           <div className="absolute bottom-0 left-0 right-0 px-4 py-4"
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
-            <p className="text-white text-center font-serif font-semibold tracking-wider"
-              style={{ fontSize: 'clamp(14px, 4vw, 20px)' }}>{name}</p>
-            <p className="text-center font-sans text-xs mt-1" style={{ color: `${gold}dd` }}>
-              ✈ {event.venue_city || 'Szczyrk'} · {dateStr}
+            <p className="text-white text-center font-serif font-light tracking-[0.1em]"
+              style={{ fontSize: 'clamp(14px, 4vw, 22px)' }}>{name}</p>
+            <p className="text-center font-sans text-xs mt-1 tracking-widest" style={{ color: `${gold}dd` }}>
+              {dateStr}
             </p>
           </div>
         </div>

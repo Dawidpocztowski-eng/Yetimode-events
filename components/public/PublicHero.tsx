@@ -67,36 +67,29 @@ function CompassSVG({ color = '#c9a84c', size = 200 }: { color?: string; size?: 
   )
 }
 
-// Mapa świata — uproszczona konturowa
+// Mapa świata — prawdziwy obraz
 function WorldMapBg() {
   return (
-    <svg viewBox="0 0 1200 600" className="absolute inset-0 w-full h-full opacity-[0.06]" preserveAspectRatio="xMidYMid slice">
-      <g fill="#c9a84c">
-        {/* Europa */}
-        <ellipse cx="580" cy="200" rx="80" ry="70" />
-        {/* Azja */}
-        <ellipse cx="820" cy="210" rx="160" ry="90" />
-        {/* Afryka */}
-        <ellipse cx="590" cy="360" rx="70" ry="100" />
-        {/* Ameryka Północna */}
-        <ellipse cx="230" cy="230" rx="120" ry="100" />
-        {/* Ameryka Połudnowa */}
-        <ellipse cx="300" cy="400" rx="70" ry="110" />
-        {/* Australia */}
-        <ellipse cx="950" cy="400" rx="80" ry="60" />
-      </g>
-    </svg>
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src="/map-world.png"
+      alt=""
+      className="absolute inset-0 w-full h-full object-cover opacity-[0.13] pointer-events-none select-none"
+      aria-hidden="true"
+    />
   )
 }
 
-// Samolot ze śladem serca
+// Samolot ze śladem serca — prawdziwy obraz
 function PlanePath({ color = '#c9a84c' }: { color?: string }) {
   return (
-    <svg width="160" height="80" viewBox="0 0 160 80" className="opacity-50">
-      <path d="M 20 60 Q 40 20 70 50 Q 90 70 80 40 L 145 15"
-        stroke={color} strokeWidth="1" fill="none" strokeDasharray="4 3" />
-      <text x="138" y="18" fontSize="16" fill={color} transform="rotate(-30, 145, 15)">✈</text>
-    </svg>
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src="/plane-heart.png"
+      alt=""
+      className="w-40 opacity-75 select-none pointer-events-none"
+      aria-hidden="true"
+    />
   )
 }
 
@@ -136,9 +129,10 @@ export default function PublicHero({ event, onRSVP, sections = {} }: Props) {
         </p>
       </div>
 
-      {/* Kompas */}
+      {/* Kompas — prawdziwy obraz */}
       <div className="relative z-10 mb-6">
-        <CompassSVG color={gold} size={160} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/compass-rose.png" alt="Kompas" className="w-40 h-40 object-contain opacity-90 select-none" aria-hidden="true" />
       </div>
 
       {/* Imiona */}
