@@ -111,19 +111,21 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
     const gold = '#c9a84c'
 
     switch (frame) {
-      // NAKŁADKA: Paszport ślubny — prawdziwa ramka + belki
+      // NAKŁADKA: Paszport ślubny — ramka z blend-mode multiply (nie zasłania obrazu)
       case 'passport': return (
         <div className="absolute inset-0 pointer-events-none">
-          {/* Ramka podróżnicza */}
+          {/* Ramka podróżnicza — multiply przepuszcza obraz kamery przez jasne obszary */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/frame-travel.png" alt="" className="absolute inset-0 w-full h-full object-fill opacity-90" />
-          {/* Dolna belka z imieniem */}
-          <div className="absolute bottom-0 left-0 right-0 px-4 py-4"
-            style={{ background: 'linear-gradient(to top, rgba(250,248,243,0.95), rgba(250,248,243,0.7) 70%, transparent)' }}>
-            <p className="text-center font-serif font-semibold tracking-[0.08em]"
-              style={{ fontSize: 'clamp(14px, 4vw, 20px)', color: '#1a1008' }}>{name}</p>
+          <img src="/frame-travel.png" alt=""
+            className="absolute inset-0 w-full h-full object-fill"
+            style={{ mixBlendMode: 'multiply', opacity: 0.85 }} />
+          {/* Dolna belka z imieniem — nad ramką */}
+          <div className="absolute bottom-0 left-0 right-0 px-4 py-3"
+            style={{ background: 'linear-gradient(to top, rgba(250,248,243,0.92), rgba(250,248,243,0.6) 70%, transparent)' }}>
+            <p className="text-center font-serif font-semibold tracking-[0.08em] text-stone-800"
+              style={{ fontSize: 'clamp(13px, 3.5vw, 18px)' }}>{name}</p>
             <p className="text-center font-sans text-xs tracking-[0.2em] mt-0.5"
-              style={{ color: `${gold}cc` }}>{dateStr}</p>
+              style={{ color: '#c9a84c' }}>{dateStr}</p>
           </div>
         </div>
       )
@@ -286,7 +288,9 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
                   className="w-full block"
                   onUserMedia={() => setCameraReady(true)}
                   onUserMediaError={() => toast.error('Brak dostępu do kamery')} />
-                {getOverlay()}
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                  {getOverlay()}
+                </div>
                 {cameraReady && (
                   <button onClick={capture}
                     className="absolute bottom-5 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full border-2 border-white/60 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all flex items-center justify-center z-20">
@@ -348,7 +352,9 @@ export default function PublicFotoBudka({ event }: { event: Event }) {
               <div className="relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photo} alt="Podgląd" className="w-full block" />
-                {getOverlay()}
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                  {getOverlay()}
+                </div>
               </div>
               <div className="flex gap-2 p-3 bg-white/60">
                 <button onClick={() => setPhoto(null)}
