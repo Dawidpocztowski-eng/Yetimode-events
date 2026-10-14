@@ -25,7 +25,9 @@ export interface Event {
   best_man_phone?: string
   maid_of_honor_name?: string
   maid_of_honor_phone?: string
-  show_contacts?: boolean   // czy sekcja kontaktów widoczna
+  show_contacts?: boolean
+  church_name?: string
+  church_time?: string
   // nowe
   visible_from?: string
   rsvp_deadline?: string
