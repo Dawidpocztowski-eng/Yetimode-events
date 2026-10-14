@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Event } from '@/lib/types'
-import { ArrowLeft, LayoutDashboard, Users, DollarSign, Grid3X3, Image, Settings } from 'lucide-react'
+import { ArrowLeft, LayoutDashboard, Users, DollarSign, Grid3X3, Image, Settings, BedDouble } from 'lucide-react'
 import EventDashboard from '@/components/dashboard/EventDashboard'
 import EventGuests from '@/components/dashboard/EventGuests'
 import EventBudget from '@/components/dashboard/EventBudget'
@@ -13,12 +13,14 @@ import EventTables from '@/components/dashboard/EventTables'
 import EventGallery from '@/components/dashboard/EventGallery'
 import EventSettings from '@/components/dashboard/EventSettings'
 import EventAdvanced from '@/components/dashboard/EventAdvanced'
+import EventRooms from '@/components/dashboard/EventRooms'
 
 const TABS = [
   { id: 'overview',  label: 'Główna',      icon: LayoutDashboard },
   { id: 'guests',    label: 'Goście',      icon: Users },
   { id: 'budget',    label: 'Budżet',      icon: DollarSign },
   { id: 'tables',    label: 'Stoliki',     icon: Grid3X3 },
+  { id: 'rooms',     label: 'Pokoje',      icon: BedDouble },
   { id: 'gallery',   label: 'Galeria',     icon: Image },
   { id: 'advanced',  label: 'Plan & Opcje', icon: Settings },
 ]
@@ -86,6 +88,7 @@ export default function EventPanelPage() {
         {activeTab === 'guests'    && <EventGuests eventId={event.id} />}
         {activeTab === 'budget'    && <EventBudget eventId={event.id} />}
         {activeTab === 'tables'    && <EventTables eventId={event.id} primaryColor={event.primary_color} />}
+        {activeTab === 'rooms'     && <EventRooms eventId={event.id} />}
         {activeTab === 'gallery'   && <EventGallery event={event} />}
         {activeTab === 'advanced'  && (
           <div className="space-y-5">

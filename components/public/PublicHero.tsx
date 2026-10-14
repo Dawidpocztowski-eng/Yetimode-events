@@ -226,6 +226,45 @@ export default function PublicHero({ event, onRSVP, sections = {} }: Props) {
         </button>
       )}
 
+      {/* Kontakty */}
+      {sections.contacts !== false && event.show_contacts && (
+        (() => {
+          const contacts = [
+            event.partner1_name && { label: 'Panna Młoda', name: event.partner1_name, phone: event.partner1_phone },
+            event.partner2_name && { label: 'Pan Młody',   name: event.partner2_name, phone: event.partner2_phone },
+            event.best_man_name && { label: 'Świadek',     name: event.best_man_name, phone: event.best_man_phone },
+            event.maid_of_honor_name && { label: 'Świadkowa', name: event.maid_of_honor_name, phone: event.maid_of_honor_phone },
+          ].filter(Boolean) as { label: string; name: string; phone?: string }[]
+
+          if (contacts.length === 0) return null
+          return (
+            <div className="relative z-10 w-full max-w-sm mt-10">
+              <div className="flex items-center justify-center gap-4 mb-5">
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${gold}40)` }} />
+                <span className="text-xs tracking-[0.4em] uppercase font-sans" style={{ color: gold }}>Kontakt</span>
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${gold}40)` }} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {contacts.map(c => (
+                  <div key={c.label} className="border p-3 text-center"
+                    style={{ borderColor: `${gold}25`, backgroundColor: `${gold}05` }}>
+                    <p className="text-xs tracking-[0.2em] uppercase font-sans mb-1" style={{ color: `${gold}99` }}>{c.label}</p>
+                    <p className="text-stone-700 font-serif font-medium text-sm">{c.name}</p>
+                    {c.phone && (
+                      <a href={`tel:${c.phone}`}
+                        className="text-xs font-sans mt-1 block transition-colors hover:underline"
+                        style={{ color: gold }}>
+                        {c.phone}
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })()
+      )}
+
       {/* Scroll indicator */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-25 z-10">
         <div className="w-px h-8 bg-gradient-to-b from-transparent to-stone-400" />

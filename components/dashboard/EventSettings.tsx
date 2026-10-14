@@ -15,9 +15,13 @@ export default function EventSettings({ event, onUpdate }: Props) {
     title: event.title, date: event.date, time: event.time || '',
     venue_name: event.venue_name || '', venue_city: event.venue_city || '',
     description: event.description || '', primary_color: event.primary_color,
-    gallery_code: event.gallery_code, partner1_name: event.partner1_name || '',
-    partner2_name: event.partner2_name || '', church_name: event.church_name || '',
-    church_time: event.church_time || '',
+    gallery_code: event.gallery_code,
+    partner1_name: event.partner1_name || '', partner2_name: event.partner2_name || '',
+    partner1_phone: event.partner1_phone || '', partner2_phone: event.partner2_phone || '',
+    best_man_name: event.best_man_name || '', best_man_phone: event.best_man_phone || '',
+    maid_of_honor_name: event.maid_of_honor_name || '', maid_of_honor_phone: event.maid_of_honor_phone || '',
+    church_name: event.church_name || '', church_time: event.church_time || '',
+    show_contacts: event.show_contacts ?? false,
   })
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -109,6 +113,41 @@ export default function EventSettings({ event, onUpdate }: Props) {
         <div><label className="label">Kod galerii</label><input value={form.gallery_code} onChange={e => set('gallery_code', e.target.value.toUpperCase())} className="input" maxLength={12} /></div>
         <button onClick={save} disabled={saving} className="btn-primary w-full">
           <Save size={16} /> {saving ? 'Zapisywanie...' : 'Zapisz zmiany'}
+        </button>
+      </div>
+
+      {/* Kontakty widoczne dla gości */}
+      <div className="card space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-gray-300 text-sm">Kontakty dla gości</h3>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <span className="text-xs text-gray-500">Pokaż na stronie</span>
+            <button type="button" onClick={() => set('show_contacts', form.show_contacts ? '' : 'true')}
+              className={`relative w-11 h-6 rounded-full transition-all duration-200 ${form.show_contacts ? 'bg-violet-600' : 'bg-white/10'}`}>
+              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${form.show_contacts ? 'left-5.5 translate-x-0.5' : 'left-0.5'}`} />
+            </button>
+          </label>
+        </div>
+        <p className="text-xs text-gray-600">Numery telefonów będą widoczne dla gości na stronie głównej jeśli włączysz pokazywanie kontaktów.</p>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="label">Panna Młoda — imię</label><input value={form.partner1_name} onChange={e => set('partner1_name', e.target.value)} className="input" placeholder="Agnieszka" /></div>
+          <div><label className="label">Panna Młoda — telefon</label><input value={form.partner1_phone} onChange={e => set('partner1_phone', e.target.value)} className="input" placeholder="+48 500 000 000" /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="label">Pan Młody — imię</label><input value={form.partner2_name} onChange={e => set('partner2_name', e.target.value)} className="input" placeholder="Dawid" /></div>
+          <div><label className="label">Pan Młody — telefon</label><input value={form.partner2_phone} onChange={e => set('partner2_phone', e.target.value)} className="input" placeholder="+48 500 000 000" /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="label">Świadek — imię</label><input value={form.best_man_name} onChange={e => set('best_man_name', e.target.value)} className="input" placeholder="Imię świadka" /></div>
+          <div><label className="label">Świadek — telefon</label><input value={form.best_man_phone} onChange={e => set('best_man_phone', e.target.value)} className="input" placeholder="+48 500 000 000" /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="label">Świadkowa — imię</label><input value={form.maid_of_honor_name} onChange={e => set('maid_of_honor_name', e.target.value)} className="input" placeholder="Imię świadkowej" /></div>
+          <div><label className="label">Świadkowa — telefon</label><input value={form.maid_of_honor_phone} onChange={e => set('maid_of_honor_phone', e.target.value)} className="input" placeholder="+48 500 000 000" /></div>
+        </div>
+        <button onClick={save} disabled={saving} className="btn-primary w-full">
+          <Save size={16} /> {saving ? 'Zapisywanie...' : 'Zapisz kontakty'}
         </button>
       </div>
 

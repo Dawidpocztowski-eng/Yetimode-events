@@ -19,8 +19,13 @@ export interface Event {
   // wesele
   partner1_name?: string
   partner2_name?: string
-  church_name?: string
-  church_time?: string
+  partner1_phone?: string
+  partner2_phone?: string
+  best_man_name?: string
+  best_man_phone?: string
+  maid_of_honor_name?: string
+  maid_of_honor_phone?: string
+  show_contacts?: boolean   // czy sekcja kontaktów widoczna
   // nowe
   visible_from?: string
   rsvp_deadline?: string
@@ -33,6 +38,7 @@ export interface Event {
     gallery: boolean
     photobooth: boolean
     schedule: boolean
+    contacts: boolean
   }
   schedule?: ScheduleItem[]
 }
@@ -93,6 +99,7 @@ export interface RSVPEntry {
   transport: boolean
   dietary_needs?: string
   notes?: string
+  room?: string
   created_at: string
 }
 
