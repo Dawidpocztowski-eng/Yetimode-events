@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Event, ScheduleItem } from '@/lib/types'
-import { Plus, Trash2, X, Save, GripVertical, Eye, EyeOff, Calendar, Clock, AlarmClock } from 'lucide-react'
+import { Plus, Trash2, X, Save, Eye, Calendar, Clock, AlarmClock, Pencil } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -42,6 +42,7 @@ export default function EventAdvanced({ event, onUpdate }: Props) {
   const [schedule, setSchedule] = useState<ScheduleItem[]>(event.schedule || [])
   const [showAddItem, setShowAddItem] = useState(false)
   const [newItem, setNewItem] = useState({ time: '', title: '', description: '', icon: '🎉' })
+  const [editItem, setEditItem] = useState<ScheduleItem | null>(null)
   const [savingSchedule, setSavingSchedule] = useState(false)
 
   const saveSettings = async () => {
@@ -66,6 +67,14 @@ export default function EventAdvanced({ event, onUpdate }: Props) {
   }
 
   const removeScheduleItem = (id: string) => setSchedule(prev => prev.filter(i => i.id !== id))
+
+  const saveEditItem = () => {
+    if (!editItem || !editItem.time || !editItem.title.trim()) { toast.error('Wpisz godzinę i tytuł'); return }
+    const updated = schedule.map(i => i.id === editItem.id ? editItem : i)
+      .sort((a, b) => a.time.localeCompare(b.time))
+    setSchedule(updated)
+    setEditItem(null)
+  }
 
   const saveSchedule = async () => {
     setSavingSchedule(true)
@@ -147,7 +156,7 @@ export default function EventAdvanced({ event, onUpdate }: Props) {
         ) : (
           <div className="space-y-2">
             {schedule.map((item, idx) => (
-              <div key={item.id} className="flex items-start gap-3 bg-white/3 border border-white/8 rounded-xl p-3">
+              <div key={item.id} className="flex items-start gap-3 bg-white/3 border border-white/8 rounded-xl p-3 group">
                 <div className="flex-shrink-0 text-xl mt-0.5">{item.icon || '🎉'}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -156,9 +165,16 @@ export default function EventAdvanced({ event, onUpdate }: Props) {
                   </div>
                   {item.description && <p className="text-gray-500 text-xs mt-0.5">{item.description}</p>}
                 </div>
-                <button onClick={() => removeScheduleItem(item.id)} className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0">
-                  <Trash2 size={14} />
-                </button>
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                  <button onClick={() => setEditItem({ ...item })}
+                    className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors">
+                    <Pencil size={13} />
+                  </button>
+                  <button onClick={() => removeScheduleItem(item.id)}
+                    className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors">
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -170,6 +186,58 @@ export default function EventAdvanced({ event, onUpdate }: Props) {
           </button>
         )}
       </div>
+
+      {/* Modal: edytuj pozycję */}
+      {editItem && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-end justify-center p-4">
+          <div className="bg-[#13131f] border border-white/10 rounded-3xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-lg text-white">Edytuj punkt planu</h3>
+              <button onClick={() => setEditItem(null)} className="text-gray-500 hover:text-gray-300"><X size={20} /></button>
+            </div>
+            <div>
+              <label className="label">Ikona</label>
+              <div className="flex gap-2 flex-wrap">
+                {SCHEDULE_ICONS.map(icon => (
+                  <button key={icon} onClick={() => setEditItem(f => f ? { ...f, icon } : f)}
+                    className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all ${editItem.icon === icon ? 'bg-violet-600/30 ring-2 ring-violet-500' : 'bg-white/5 hover:bg-white/10'}`}>
+                    {icon}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label">Godzina *</label>
+                <input type="time" value={editItem.time}
+                  onChange={e => setEditItem(f => f ? { ...f, time: e.target.value } : f)}
+                  className="input" autoFocus />
+              </div>
+              <div>
+                <label className="label">Tytuł *</label>
+                <input value={editItem.title}
+                  onChange={e => setEditItem(f => f ? { ...f, title: e.target.value } : f)}
+                  className="input" />
+              </div>
+            </div>
+            <div>
+              <label className="label">Opis (opcjonalnie)</label>
+              <input value={editItem.description || ''}
+                onChange={e => setEditItem(f => f ? { ...f, description: e.target.value } : f)}
+                className="input" placeholder="np. Sanktuarium Matki Bożej" />
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setEditItem(null)}
+                className="flex-1 py-3 rounded-2xl bg-white/5 text-gray-400 border border-white/10 text-sm font-medium hover:bg-white/10 transition-all">
+                Anuluj
+              </button>
+              <button onClick={saveEditItem} className="flex-1 btn-primary">
+                <Save size={15} /> Zapisz
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal: dodaj pozycję */}
       {showAddItem && (
