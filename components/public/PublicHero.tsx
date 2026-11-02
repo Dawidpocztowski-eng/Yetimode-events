@@ -75,6 +75,7 @@ function WorldMapBg() {
       src="/map-world.png"
       alt=""
       className="absolute inset-0 w-full h-full object-cover opacity-[0.13] pointer-events-none select-none"
+      style={{ maskImage: 'linear-gradient(to bottom, black 40%, transparent 75%)', WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 75%)' }}
       aria-hidden="true"
     />
   )
