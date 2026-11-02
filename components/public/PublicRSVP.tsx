@@ -53,7 +53,7 @@ export default function PublicRSVP({ event }: { event: Event }) {
           Dziękujemy
         </h2>
         <div className="w-12 h-px mx-auto mb-4" style={{ backgroundColor: gold }} />
-        <p className="text-stone-500 text-sm font-sans leading-relaxed">
+        <p className="text-stone-600 text-sm font-sans leading-relaxed">
           {form.attending === 'yes'
             ? `Cieszymy się, że będziesz z nami, ${form.firstName}. Do zobaczenia w Szczyrku! ✈`
             : `Szkoda, że nie będziesz mógł/mogła dołączyć, ${form.firstName}.`}
@@ -62,15 +62,15 @@ export default function PublicRSVP({ event }: { event: Event }) {
     </div>
   )
 
-  const inputClass = "w-full bg-white/70 border border-stone-200 rounded-xl px-4 py-3 text-sm font-sans placeholder-stone-300 outline-none transition-all text-stone-700 focus:border-stone-400 focus:bg-white"
+  const inputClass = "w-full bg-white/70 border border-stone-200 rounded-xl px-4 py-3 text-sm font-sans placeholder-stone-400 outline-none transition-all text-black focus:border-stone-400 focus:bg-white"
 
   const OptionButton = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button type="button" onClick={onClick}
       className="flex-1 py-3.5 text-sm font-sans font-medium border-2 rounded-xl transition-all duration-200"
       style={{
-        borderColor: active ? gold : 'rgba(0,0,0,0.1)',
+        borderColor: active ? gold : 'rgba(0,0,0,0.15)',
         backgroundColor: active ? gold : 'white',
-        color: active ? '#ffffff' : '#5a4a35',
+        color: active ? '#ffffff' : '#000000',
         boxShadow: active ? `0 4px 12px ${gold}40` : 'none',
       }}>
       {children}
@@ -105,7 +105,7 @@ export default function PublicRSVP({ event }: { event: Event }) {
                 ? `${event.partner1_name} & ${event.partner2_name}`
                 : event.title}
             </h2>
-            <p className="text-stone-400 text-sm font-sans mt-1 tracking-wider">
+            <p className="text-stone-600 text-sm font-sans mt-1 tracking-wider">
               {new Date(event.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}
               {event.venue_city ? ` · ${event.venue_city}` : ''}
             </p>
@@ -165,7 +165,7 @@ export default function PublicRSVP({ event }: { event: Event }) {
                   Liczba pasażerów
                 </label>
                 <div className="flex gap-2">
-                  {[1, 2, 3, 4].map(n => (
+                  {[1, 2, 3, 4, 5].map(n => (
                     <OptionButton key={n} active={form.guests === String(n)} onClick={() => set('guests', String(n))}>
                       {n}
                     </OptionButton>
