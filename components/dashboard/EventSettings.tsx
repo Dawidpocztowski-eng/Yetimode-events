@@ -33,8 +33,8 @@ export default function EventSettings({ event, onUpdate }: Props) {
     maid_of_honor_name: event.maid_of_honor_name || '',
     maid_of_honor_phone: event.maid_of_honor_phone || '',
     show_contacts: event.show_contacts ?? false,
+    show_witnesses: event.show_witnesses ?? false,
   })
-  const [showContactsPara, setShowContactsPara] = useState(true) // rozwinięta sekcja
   const [savingContacts, setSavingContacts] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
@@ -66,6 +66,7 @@ export default function EventSettings({ event, onUpdate }: Props) {
       maid_of_honor_name: contacts.maid_of_honor_name || null,
       maid_of_honor_phone: contacts.maid_of_honor_phone || null,
       show_contacts: contacts.show_contacts,
+      show_witnesses: contacts.show_witnesses,
     }
     const { data, error } = await supabase.from('events').update(payload).eq('id', event.id).select().single()
     if (!error && data) { onUpdate(data); toast.success('Kontakty zapisane!') }
@@ -166,14 +167,14 @@ export default function EventSettings({ event, onUpdate }: Props) {
             <Phone size={15} className="text-violet-400" /> Para Młoda — kontakt
           </h3>
           <label className="flex items-center gap-2 cursor-pointer select-none">
-            <span className="text-xs text-gray-500">Pokaż na stronie</span>
+            <span className="text-xs text-gray-500">Widoczna dla gości</span>
             <button type="button" onClick={() => setC('show_contacts', !contacts.show_contacts)}
               className={`relative w-11 h-6 rounded-full transition-all duration-200 flex-shrink-0 ${contacts.show_contacts ? 'bg-violet-600' : 'bg-white/10'}`}>
               <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${contacts.show_contacts ? 'left-[22px]' : 'left-0.5'}`} />
             </button>
           </label>
         </div>
-        <p className="text-xs text-gray-600">Numery telefonów widoczne dla gości na stronie głównej.</p>
+        <p className="text-xs text-gray-600">Numery telefonów Pary będą widoczne na stronie gości.</p>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="label">Panna Młoda — imię</label>
@@ -201,10 +202,19 @@ export default function EventSettings({ event, onUpdate }: Props) {
 
       {/* Kontakty — Świadkowie */}
       <div className="card space-y-4">
-        <h3 className="font-semibold text-gray-300 text-sm flex items-center gap-2">
-          <Phone size={15} className="text-amber-400" /> Świadkowie — kontakt
-        </h3>
-        <p className="text-xs text-gray-600">Widoczne razem z kontaktami Pary jeśli jest włączone "Pokaż na stronie".</p>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-gray-300 text-sm flex items-center gap-2">
+            <Phone size={15} className="text-amber-400" /> Świadkowie — kontakt
+          </h3>
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <span className="text-xs text-gray-500">Widoczni dla gości</span>
+            <button type="button" onClick={() => setC('show_witnesses', !contacts.show_witnesses)}
+              className={`relative w-11 h-6 rounded-full transition-all duration-200 flex-shrink-0 ${contacts.show_witnesses ? 'bg-amber-500' : 'bg-white/10'}`}>
+              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${contacts.show_witnesses ? 'left-[22px]' : 'left-0.5'}`} />
+            </button>
+          </label>
+        </div>
+        <p className="text-xs text-gray-600">Numery telefonów Świadków będą widoczne na stronie gości niezależnie od Pary.</p>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="label">Świadek — imię</label>

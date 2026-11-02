@@ -26,6 +26,7 @@ export interface Event {
   maid_of_honor_name?: string
   maid_of_honor_phone?: string
   show_contacts?: boolean
+  show_witnesses?: boolean
   church_name?: string
   church_time?: string
   // nowe
